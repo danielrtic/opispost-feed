@@ -10,11 +10,8 @@ from urllib3.util.retry import Retry
 # ==========================================
 API_USER = os.environ.get('FOURTHWALL_API_USER')
 API_PASS = os.environ.get('FOURTHWALL_API_PASS')
-STORE_URL = 'https://tu-tienda.fourthwall.com' 
+STORE_URL = 'https://tu-tienda.fourthwall.com' # ¡Asegúrate de cambiar esto!
 BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
-
-# Activar depuración detallada
-DEBUG_MODE = True
 
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 429, 500, 502, 503, 504 ])
@@ -34,62 +31,42 @@ def get_all_products():
     
     while page <= total_pages:
         url = f"{BASE_API_URL}/products?page={page}&limit=50"
+        print(f"-> Solicitando página {page} de {total_pages}...")
         
-        if DEBUG_MODE:
-            print(f"\n[DEBUG] ----------------------------------------")
-            print(f"[DEBUG] Ejecutando GET a: {url}")
-            print(f"[DEBUG] Usuario usado: {'SI' if API_USER else 'NO'}, Password usado: {'SI' if API_PASS else 'NO'}")
-            
         response = session.get(url)
         
-        if DEBUG_MODE:
-            print(f"[DEBUG] Código de estado HTTP: {response.status_code}")
-            # Imprimimos los primeros 1000 caracteres de la respuesta cruda para ver qué devuelve
-            print(f"[DEBUG] Respuesta cruda: {response.text[:1000]}")
-            print(f"[DEBUG] ----------------------------------------\n")
-        
         if response.status_code == 200:
-            try:
-                data = response.json()
-                
-                # Intentamos extraer los productos. A veces la API usa 'results' en lugar de 'data'
-                items = data.get('data', [])
-                if not items and 'results' in data:
-                    items = data.get('results', [])
-                elif not items and isinstance(data, list):
-                    items = data # Por si la API devuelve la lista directamente
-                    
-                if DEBUG_MODE: 
-                    print(f"[DEBUG] Claves del JSON devuelto: {list(data.keys()) if isinstance(data, dict) else 'Es una lista directa'}")
-                    print(f"[DEBUG] Se encontraron {len(items)} productos en la página {page}.")
-                
-                products.extend(items)
-                
-                # Manejo seguro de la paginación
-                pagination = data.get('pagination', {})
-                total_pages = pagination.get('total_pages', 1) if isinstance(pagination, dict) else 1
-                page += 1
-            except Exception as e:
-                print(f"❌ [DEBUG] Error procesando el JSON de respuesta: {e}")
-                break
+            data = response.json()
+            
+            # 1. Corrección: La lista de productos viene en 'results'
+            items = data.get('results', [])
+            products.extend(items)
+            
+            print(f"   Se encontraron {len(items)} productos en esta página.")
+            
+            # 2. Corrección: La paginación usa 'totalPages' directamente en la raíz
+            total_pages = data.get('totalPages', 1)
+            page += 1
         else:
-            print(f"❌ Error API: {response.status_code} al llamar a {url}")
+            print(f"❌ Error API: {response.status_code}")
             print(f"Detalle: {response.text}")
             break
             
+    print(f"✅ Total de productos obtenidos: {len(products)}")
     return products
 
-def categorize_product(title, tags, template_category):
-    search_string = f"{title} {' '.join(tags)} {template_category}".lower()
+def categorize_product(title):
+    # Función simplificada usando solo el título
+    search_string = title.lower()
     category = "Apparel & Accessories"
     gender = "unisex"
     age_group = "adult"
     is_apparel = True 
 
-    if any(word in search_string for word in ['mug', 'taza', 'cup']):
+    if any(word in search_string for word in ['mug', 'taza', 'cup', 'vaso']):
         category = 'Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs'
         is_apparel = False
-    elif any(word in search_string for word in ['poster', 'print', 'canvas']):
+    elif any(word in search_string for word in ['poster', 'print', 'canvas', 'arte', 'cuadro', 'digital']):
         category = 'Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork'
         is_apparel = False
     
@@ -98,70 +75,99 @@ def categorize_product(title, tags, template_category):
 def build_xml_feed():
     products = get_all_products()
     if not products:
-        print("⚠️ No se encontraron productos o falló la conexión.")
+        print("⚠️ No se encontraron productos.")
         return
 
     xml_items = []
 
     for product in products:
         product_id = product.get('id')
+        title = product.get('name', 'Producto sin nombre')
+        slug = product.get('slug', '')
         
-        if DEBUG_MODE:
-            print(f"[DEBUG] Procesando producto ID: {product_id}")
-            
-        details = session.get(f"{BASE_API_URL}/products/{product_id}").json().get('data', {})
-        template_id = details.get('template_id')
-        template = session.get(f"{BASE_API_URL}/product-templates/{template_id}").json().get('data', {}) if template_id else {}
-        
-        title = details.get('name', product.get('name', ''))
-        tags = details.get('tags', [])
-        template_category = template.get('category', 'Merch')
-        classification = categorize_product(title, tags, template_category)
-        
-        description = details.get('description', '').replace('\n', ' ')
-        product_link = f"{STORE_URL}/products/{details.get('slug', '')}"
-        
-        images = details.get('images', [])
-        main_image_link = images[0].get('url') if images else ''
-        material = template.get('material_info', '')
-        product_type = ", ".join(tags[:3]) if tags else template_category
+        # Limpiar descripción básica
+        raw_description = product.get('description', '')
+        # Eliminar posibles etiquetas HTML simples si las hay (muy básico)
+        clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
+        if not clean_description:
+            clean_description = title
 
-        for variant in details.get('variants', []):
-            variant_id = variant.get('id')
-            attributes = variant.get('attributes', {})
-            
-            color = attributes.get('color', attributes.get('Color', '')) if classification['is_apparel'] else ''
-            size = attributes.get('size', attributes.get('Size', '')) if classification['is_apparel'] else ''
+        product_link = f"{STORE_URL}/products/{slug}"
+        classification = categorize_product(title)
 
-            price_info = variant.get('price', {})
-            price_str = f"{price_info.get('value', 0)} {price_info.get('currency', 'USD')}"
-            full_title = f"{title} - {variant.get('name', '')}" if variant.get('name', '') else title
+        # 3. Corrección: Adaptación a la estructura de la Open API para variantes e imágenes
+        # Revisamos si el producto tiene variantes directas. Si no, usamos el producto en sí.
+        variants = product.get('variants', [])
+        
+        # Obtenemos la imagen principal (mirando la estructura de tu log)
+        images = product.get('images', [])
+        main_image_link = ''
+        if images:
+            # Algunas APIs devuelven un string directo, otras un diccionario. Manejamos ambas.
+            first_img = images[0]
+            if isinstance(first_img, dict):
+                main_image_link = first_img.get('url', first_img.get('transformedUrl', ''))
+            elif isinstance(first_img, str):
+                main_image_link = first_img
+
+        if not variants:
+            # Si la API no devuelve variantes detalladas, creamos un item base
+            # Intentamos buscar el precio base si existe
+            price_amount = product.get('price', {}).get('value', '0.00')
+            price_currency = product.get('price', {}).get('currency', 'USD')
+            price_str = f"{price_amount} {price_currency}"
 
             item_xml = f"""
         <item>
-            <g:id>{escape(variant_id)}</g:id>
-            <g:item_group_id>{escape(product_id)}</g:item_group_id>
+            <g:id>{escape(str(product_id))}</g:id>
+            <g:item_group_id>{escape(str(product_id))}</g:item_group_id>
+            <g:title>{escape(title[:150])}</g:title>
+            <g:description>{escape(clean_description[:500])}</g:description>
+            <g:link>{escape(product_link)}</g:link>
+            <g:image_link>{escape(main_image_link)}</g:image_link>
+            <g:price>{escape(price_str)}</g:price>
+            <g:availability>in stock</g:availability>
+            <g:condition>new</g:condition>
+            <g:google_product_category>{escape(classification['gpc'])}</g:google_product_category>"""
+            
+            if classification['gender']: item_xml += f"\n            <g:gender>{classification['gender']}</g:gender>"
+            if classification['age_group']: item_xml += f"\n            <g:age_group>{classification['age_group']}</g:age_group>"
+            item_xml += "\n        </item>"
+            xml_items.append(item_xml)
+
+        else:
+            # Si hay variantes (ej: tallas), creamos una fila por cada una
+            for variant in variants:
+                variant_id = variant.get('id', product_id)
+                v_name = variant.get('name', '')
+                full_title = f"{title} - {v_name}" if v_name else title
+                
+                v_price = variant.get('price', {})
+                price_str = f"{v_price.get('value', '0.00')} {v_price.get('currency', 'USD')}"
+                
+                attributes = variant.get('attributes', {})
+                color = attributes.get('color', '') if classification['is_apparel'] else ''
+                size = attributes.get('size', '') if classification['is_apparel'] else ''
+
+                item_xml = f"""
+        <item>
+            <g:id>{escape(str(variant_id))}</g:id>
+            <g:item_group_id>{escape(str(product_id))}</g:item_group_id>
             <g:title>{escape(full_title[:150])}</g:title>
-            <g:description>{escape(description[:500])}</g:description>
+            <g:description>{escape(clean_description[:500])}</g:description>
             <g:link>{escape(f"{product_link}?variant={variant_id}")}</g:link>
             <g:image_link>{escape(main_image_link)}</g:image_link>
             <g:price>{escape(price_str)}</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>{escape(classification['gpc'])}</g:google_product_category>
-            <g:product_type>{escape(product_type)}</g:product_type>"""
-            
-            if color: item_xml += f"\n            <g:color>{escape(color)}</g:color>"
-            if size: item_xml += f"\n            <g:size>{escape(size)}</g:size>"
-            if classification['gender']: item_xml += f"\n            <g:gender>{classification['gender']}</g:gender>"
-            if classification['age_group']: item_xml += f"\n            <g:age_group>{classification['age_group']}</g:age_group>"
-            if material: item_xml += f"\n            <g:material>{escape(material)}</g:material>"
-            if tags: item_xml += f"\n            <g:custom_label_0>{escape(tags[0])}</g:custom_label_0>"
-            
-            item_xml += "\n        </item>"
-            xml_items.append(item_xml)
-            
-        time.sleep(0.05)
+            <g:google_product_category>{escape(classification['gpc'])}</g:google_product_category>"""
+                
+                if color: item_xml += f"\n            <g:color>{escape(color)}</g:color>"
+                if size: item_xml += f"\n            <g:size>{escape(size)}</g:size>"
+                if classification['gender']: item_xml += f"\n            <g:gender>{classification['gender']}</g:gender>"
+                if classification['age_group']: item_xml += f"\n            <g:age_group>{classification['age_group']}</g:age_group>"
+                item_xml += "\n        </item>"
+                xml_items.append(item_xml)
 
     final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
@@ -175,10 +181,10 @@ def build_xml_feed():
 
     with open('pinterest_feed.xml', 'w', encoding='utf-8') as f:
         f.write(final_xml)
-    print("✅ Feed XML generado exitosamente.")
+    print(f"✅ Feed XML generado exitosamente con {len(xml_items)} items.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
-        print("❌ Error: Faltan las credenciales FOURTHWALL_API_USER y/o FOURTHWALL_API_PASS.")
+        print("❌ Error: Faltan las credenciales.")
     else:
         build_xml_feed()
