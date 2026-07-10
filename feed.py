@@ -10,7 +10,7 @@ from urllib3.util.retry import Retry
 # ==========================================
 API_USER = os.environ.get('FOURTHWALL_API_USER')
 API_PASS = os.environ.get('FOURTHWALL_API_PASS')
-STORE_URL = 'https://tu-tienda.fourthwall.com' # Recuerda poner tu URL real
+STORE_URL = 'https://opispot.com' # Recuerda poner tu URL real
 BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 
 session = requests.Session()
