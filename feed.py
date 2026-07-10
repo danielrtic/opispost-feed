@@ -6,17 +6,25 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 # ==========================================
-# CONFIGURACIÓN (Lee la API KEY desde GitHub Secrets)
+# CONFIGURACIÓN (Lee las credenciales de GitHub Secrets)
 # ==========================================
-API_KEY = os.environ.get('FOURTHWALL_API_KEY', 'TU_API_KEY_LOCAL_PARA_PRUEBAS')
-STORE_URL = 'https://tu-tienda.fourthwall.com'
-BASE_API_URL = 'https://api.fourthwall.com/v1'
+API_USER = os.environ.get('FOURTHWALL_API_USER')
+API_PASS = os.environ.get('FOURTHWALL_API_PASS')
 
+# ¡IMPORTANTE! Cambia esto por la URL real de tu tienda:
+STORE_URL = 'https://tu-tienda.fourthwall.com' 
+
+# URL corregida para la Open API de Fourthwall
+BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
+
+# Configuración de sesión y reintentos automáticos
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 429, 500, 502, 503, 504 ])
 session.mount('https://', HTTPAdapter(max_retries=retries))
+
+# >>> SOLUCIÓN: Autenticación Basic Auth (Usuario y Contraseña) <<<
+session.auth = (API_USER, API_PASS)
 session.headers.update({
-    'Authorization': f'Bearer {API_KEY}',
     'Content-Type': 'application/json',
     'Accept': 'application/json'
 })
@@ -27,20 +35,25 @@ def get_all_products():
     page = 1
     total_pages = 1
     print("📦 Obteniendo catálogo completo...")
+    
     while page <= total_pages:
-        response = session.get(f"{BASE_API_URL}/products?page={page}&limit=50")
+        url = f"{BASE_API_URL}/products?page={page}&limit=50"
+        response = session.get(url)
+        
         if response.status_code == 200:
             data = response.json()
             products.extend(data.get('data', []))
             total_pages = data.get('pagination', {}).get('total_pages', 1)
             page += 1
         else:
-            print(f"❌ Error API: {response.status_code}")
+            print(f"❌ Error API: {response.status_code} al llamar a {url}")
+            print(f"Detalle: {response.text}")
             break
+            
     return products
 
-# (Aquí mantienes la función de categorización inteligente del mensaje anterior)
 def categorize_product(title, tags, template_category):
+    """Categorización inteligente para Google / Pinterest."""
     search_string = f"{title} {' '.join(tags)} {template_category}".lower()
     category = "Apparel & Accessories"
     gender = "unisex"
@@ -58,6 +71,10 @@ def categorize_product(title, tags, template_category):
 
 def build_xml_feed():
     products = get_all_products()
+    if not products:
+        print("⚠️ No se encontraron productos o falló la conexión.")
+        return
+
     xml_items = []
 
     for product in products:
@@ -90,7 +107,7 @@ def build_xml_feed():
             price_str = f"{price_info.get('value', 0)} {price_info.get('currency', 'USD')}"
             full_title = f"{title} - {variant.get('name', '')}" if variant.get('name', '') else title
 
-            # Crear nodo de item XML asegurando escapar caracteres especiales (como &, <, >)
+            # Crear nodo XML
             item_xml = f"""
         <item>
             <g:id>{escape(variant_id)}</g:id>
@@ -117,7 +134,6 @@ def build_xml_feed():
             
         time.sleep(0.05)
 
-    # Envolver todo en la estructura XML de RSS 2.0 requerida por Pinterest
     final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
     <channel>
@@ -133,4 +149,7 @@ def build_xml_feed():
     print("✅ Feed XML generado exitosamente.")
 
 if __name__ == "__main__":
-    build_xml_feed()
+    if not API_USER or not API_PASS:
+        print("❌ Error: Faltan las credenciales FOURTHWALL_API_USER y/o FOURTHWALL_API_PASS.")
+    else:
+        build_xml_feed()
