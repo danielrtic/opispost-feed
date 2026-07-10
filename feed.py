@@ -10,7 +10,7 @@ from urllib3.util.retry import Retry
 # ==========================================
 API_USER = os.environ.get('FOURTHWALL_API_USER')
 API_PASS = os.environ.get('FOURTHWALL_API_PASS')
-STORE_URL = 'https://tu-tienda.fourthwall.com' # ¡Asegúrate de cambiar esto!
+STORE_URL = 'https://tu-tienda.fourthwall.com' # Recuerda poner tu URL real
 BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 
 session = requests.Session()
@@ -22,6 +22,22 @@ session.headers.update({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
 })
+
+def safe_escape(val):
+    """
+    Función escudo: Convierte diccionarios y listas a texto 
+    antes de aplicar el escape XML para evitar cuelgues.
+    """
+    if not val:
+        return ""
+    if isinstance(val, dict):
+        # Si es un diccionario, intentamos sacar su nombre o valor
+        val = val.get('name', val.get('value', str(val)))
+    elif isinstance(val, list):
+        # Si es una lista, la unimos con comas
+        val = ", ".join(str(v) for v in val)
+    
+    return escape(str(val))
 
 def get_all_products():
     products = []
@@ -38,13 +54,11 @@ def get_all_products():
         if response.status_code == 200:
             data = response.json()
             
-            # 1. Corrección: La lista de productos viene en 'results'
             items = data.get('results', [])
             products.extend(items)
             
             print(f"   Se encontraron {len(items)} productos en esta página.")
             
-            # 2. Corrección: La paginación usa 'totalPages' directamente en la raíz
             total_pages = data.get('totalPages', 1)
             page += 1
         else:
@@ -56,7 +70,6 @@ def get_all_products():
     return products
 
 def categorize_product(title):
-    # Función simplificada usando solo el título
     search_string = title.lower()
     category = "Apparel & Accessories"
     gender = "unisex"
@@ -85,9 +98,7 @@ def build_xml_feed():
         title = product.get('name', 'Producto sin nombre')
         slug = product.get('slug', '')
         
-        # Limpiar descripción básica
         raw_description = product.get('description', '')
-        # Eliminar posibles etiquetas HTML simples si las hay (muy básico)
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description:
             clean_description = title
@@ -95,15 +106,11 @@ def build_xml_feed():
         product_link = f"{STORE_URL}/products/{slug}"
         classification = categorize_product(title)
 
-        # 3. Corrección: Adaptación a la estructura de la Open API para variantes e imágenes
-        # Revisamos si el producto tiene variantes directas. Si no, usamos el producto en sí.
         variants = product.get('variants', [])
         
-        # Obtenemos la imagen principal (mirando la estructura de tu log)
         images = product.get('images', [])
         main_image_link = ''
         if images:
-            # Algunas APIs devuelven un string directo, otras un diccionario. Manejamos ambas.
             first_img = images[0]
             if isinstance(first_img, dict):
                 main_image_link = first_img.get('url', first_img.get('transformedUrl', ''))
@@ -111,32 +118,29 @@ def build_xml_feed():
                 main_image_link = first_img
 
         if not variants:
-            # Si la API no devuelve variantes detalladas, creamos un item base
-            # Intentamos buscar el precio base si existe
             price_amount = product.get('price', {}).get('value', '0.00')
             price_currency = product.get('price', {}).get('currency', 'USD')
             price_str = f"{price_amount} {price_currency}"
 
             item_xml = f"""
         <item>
-            <g:id>{escape(str(product_id))}</g:id>
-            <g:item_group_id>{escape(str(product_id))}</g:item_group_id>
-            <g:title>{escape(title[:150])}</g:title>
-            <g:description>{escape(clean_description[:500])}</g:description>
-            <g:link>{escape(product_link)}</g:link>
-            <g:image_link>{escape(main_image_link)}</g:image_link>
-            <g:price>{escape(price_str)}</g:price>
+            <g:id>{safe_escape(product_id)}</g:id>
+            <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
+            <g:title>{safe_escape(title[:150])}</g:title>
+            <g:description>{safe_escape(clean_description[:500])}</g:description>
+            <g:link>{safe_escape(product_link)}</g:link>
+            <g:image_link>{safe_escape(main_image_link)}</g:image_link>
+            <g:price>{safe_escape(price_str)}</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>{escape(classification['gpc'])}</g:google_product_category>"""
+            <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
             
-            if classification['gender']: item_xml += f"\n            <g:gender>{classification['gender']}</g:gender>"
-            if classification['age_group']: item_xml += f"\n            <g:age_group>{classification['age_group']}</g:age_group>"
+            if classification['gender']: item_xml += f"\n            <g:gender>{safe_escape(classification['gender'])}</g:gender>"
+            if classification['age_group']: item_xml += f"\n            <g:age_group>{safe_escape(classification['age_group'])}</g:age_group>"
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
 
         else:
-            # Si hay variantes (ej: tallas), creamos una fila por cada una
             for variant in variants:
                 variant_id = variant.get('id', product_id)
                 v_name = variant.get('name', '')
@@ -151,21 +155,21 @@ def build_xml_feed():
 
                 item_xml = f"""
         <item>
-            <g:id>{escape(str(variant_id))}</g:id>
-            <g:item_group_id>{escape(str(product_id))}</g:item_group_id>
-            <g:title>{escape(full_title[:150])}</g:title>
-            <g:description>{escape(clean_description[:500])}</g:description>
-            <g:link>{escape(f"{product_link}?variant={variant_id}")}</g:link>
-            <g:image_link>{escape(main_image_link)}</g:image_link>
-            <g:price>{escape(price_str)}</g:price>
+            <g:id>{safe_escape(variant_id)}</g:id>
+            <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
+            <g:title>{safe_escape(full_title[:150])}</g:title>
+            <g:description>{safe_escape(clean_description[:500])}</g:description>
+            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
+            <g:image_link>{safe_escape(main_image_link)}</g:image_link>
+            <g:price>{safe_escape(price_str)}</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>{escape(classification['gpc'])}</g:google_product_category>"""
+            <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
                 
-                if color: item_xml += f"\n            <g:color>{escape(color)}</g:color>"
-                if size: item_xml += f"\n            <g:size>{escape(size)}</g:size>"
-                if classification['gender']: item_xml += f"\n            <g:gender>{classification['gender']}</g:gender>"
-                if classification['age_group']: item_xml += f"\n            <g:age_group>{classification['age_group']}</g:age_group>"
+                if color: item_xml += f"\n            <g:color>{safe_escape(color)}</g:color>"
+                if size: item_xml += f"\n            <g:size>{safe_escape(size)}</g:size>"
+                if classification['gender']: item_xml += f"\n            <g:gender>{safe_escape(classification['gender'])}</g:gender>"
+                if classification['age_group']: item_xml += f"\n            <g:age_group>{safe_escape(classification['age_group'])}</g:age_group>"
                 item_xml += "\n        </item>"
                 xml_items.append(item_xml)
 
