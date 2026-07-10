@@ -1,6 +1,7 @@
 import requests
 import time
 import os
+import json
 from xml.sax.saxutils import escape
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -22,30 +23,13 @@ session.headers.update({
     'Accept': 'application/json'
 })
 
-# ==========================================
-# DICCIONARIO ESTRICTO DE PLANTILLAS
-# ==========================================
 CATEGORIAS_FOURTHWALL = {
     "shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "t-shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "camiseta": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "hoodie": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "sudadera": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "apparel": {"gpc": "Apparel & Accessories > Clothing", "is_apparel": True},
     "mug": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
-    "taza": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
-    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware", "is_apparel": False},
     "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
-    "pegatina": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
     "notebook": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-    "journal": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-    "libreta": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-    "cuaderno": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-    "laptop sleeve": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
-    "funda": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
     "poster": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
-    "print": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
-    "canvas": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False}
+    "laptop case": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False}
 }
 
 CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories", "is_apparel": True} 
@@ -67,7 +51,6 @@ def extract_price(data_dict):
     return "0.00 USD"
 
 def get_all_products_summary():
-    """Obtiene la lista básica de IDs de productos."""
     products = []
     page = 1
     total_pages = 1
@@ -76,7 +59,6 @@ def get_all_products_summary():
     while page <= total_pages:
         url = f"{BASE_API_URL}/products?page={page}&limit=50"
         response = session.get(url)
-        
         if response.status_code == 200:
             data = response.json()
             items = data.get('results', [])
@@ -86,37 +68,61 @@ def get_all_products_summary():
         else:
             print(f"❌ Error API: {response.status_code}")
             break
-            
     return products
 
-def get_product_details(product_id):
-    """Deep Fetch: Pide la ficha técnica completa del producto a la API."""
+def get_product_details(product_id, is_first=False):
     url = f"{BASE_API_URL}/products/{product_id}"
     response = session.get(url)
     if response.status_code == 200:
         data = response.json()
-        # Fourthwall puede devolver el objeto directo o envuelto en 'data'
-        return data.get('data', data)
+        data = data.get('data', data) # Extrae la data pura
+        
+        # MODO FORENSE: Imprime el primer producto al 100% en consola
+        if is_first:
+            print("\n" + "="*60)
+            print("🕵️ MODO FORENSE: JSON PURO DEL PRIMER PRODUCTO DESDE LA API")
+            print("Revisa esto para confirmar que Fourthwall NO envía la plantilla:")
+            print("="*60)
+            print(json.dumps(data, indent=2))
+            print("="*60 + "\n")
+            
+        return data
     return None
 
 def get_exact_classification(detailed_product):
-    """Busca estrictamente en los metadatos profundos."""
+    """
+    Clasificación estricta: NO usa el título.
+    Usa metadatos ocultos (si existen) o datos físicos empíricos de las variantes.
+    """
+    # 1. Búsqueda de metadatos profundos (Por si Fourthwall los activa algún día)
     fields_to_check = []
-    
-    # Revisamos todos los rincones del JSON detallado
     if detailed_product.get('productType'): fields_to_check.append(str(detailed_product.get('productType')).lower())
     if detailed_product.get('type'): fields_to_check.append(str(detailed_product.get('type')).lower())
-    if detailed_product.get('category'): fields_to_check.append(str(detailed_product.get('category')).lower())
     
-    tags = detailed_product.get('tags', [])
-    if isinstance(tags, list):
-        for t in tags: fields_to_check.append(str(t).lower())
-            
     for field in fields_to_check:
         for key, data in CATEGORIAS_FOURTHWALL.items():
-            if key == field or key in field:
-                return data, field
+            if key in field: return data, f"Metadato: {field}"
+
+    # 2. Búsqueda Estricta por Atributos Físicos (NO adivinanza)
+    variants = detailed_product.get('variants', [])
+    for variant in variants:
+        attrs = variant.get('attributes', {})
+        for attr_key, attr_val in attrs.items():
+            val_str = str(attr_val).lower()
+            
+            # Es una taza si su capacidad se mide en onzas
+            if 'oz' in val_str: 
+                return CATEGORIAS_FOURTHWALL["mug"], "Atributo Físico (Capacidad Oz)"
                 
+            # Es ropa si usa tallaje textil estandarizado
+            if val_str in ['s', 'm', 'l', 'xl', '2xl', '3xl', '4xl']: 
+                return CATEGORIAS_FOURTHWALL["shirt"], "Atributo Físico (Tallaje Textil)"
+                
+            # Son pósters/lienzos si usan medidas por pulgadas/cm (ej. 18x24)
+            if 'x' in val_str and ('"' in val_str or 'inch' in val_str or 'cm' in val_str):
+                return CATEGORIAS_FOURTHWALL["poster"], "Atributo Físico (Dimensiones de Arte)"
+
+    # 3. Clasificación base segura
     return CATEGORIA_DEFAULT, None
 
 def build_xml_feed():
@@ -128,27 +134,25 @@ def build_xml_feed():
     xml_items = []
     print(f"🔍 Iniciando Deep Fetch para {len(summary_products)} productos...")
 
+    is_first_product = True
+
     for summary in summary_products:
         product_id = summary.get('id')
         title = summary.get('name', 'Producto sin nombre')
         slug = summary.get('slug', '')
         
-        # <<< DEEP FETCH: Llamada individual por producto >>>
-        detailed_product = get_product_details(product_id)
+        detailed_product = get_product_details(product_id, is_first=is_first_product)
+        is_first_product = False # Solo imprime el primero
         
-        # Si la llamada falla, usamos el resumen básico como respaldo
-        if not detailed_product:
-            detailed_product = summary
-            
-        # Pausa para no saturar la API
+        if not detailed_product: detailed_product = summary
         time.sleep(0.1)
 
         classification, matched_term = get_exact_classification(detailed_product)
         
         if matched_term:
-            print(f"✔️ [{title}] -> Plantilla: '{matched_term}' -> {classification['gpc']}")
+            print(f"✔️ [{title[:30]}...] -> Identificado por {matched_term} -> {classification['gpc'].split('>')[-1].strip()}")
         else:
-            print(f"⚠️ [{title}] -> Ficha profunda revisada. API sigue sin enviar plantilla/etiqueta. Default: Ropa.")
+            print(f"⚠️ [{title[:30]}...] -> Sin atributos físicos claros. Default: Ropa.")
 
         raw_description = detailed_product.get('description', summary.get('description', ''))
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
@@ -186,9 +190,7 @@ def build_xml_feed():
             <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
             
             if classification['is_apparel']:
-                item_xml += f"\n            <g:gender>unisex</g:gender>"
-                item_xml += f"\n            <g:age_group>adult</g:age_group>"
-                
+                item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
         else:
@@ -218,11 +220,8 @@ def build_xml_feed():
                 
                 if color: item_xml += f"\n            <g:color>{safe_escape(color)}</g:color>"
                 if size: item_xml += f"\n            <g:size>{safe_escape(size)}</g:size>"
-                
                 if classification['is_apparel']:
-                    item_xml += f"\n            <g:gender>unisex</g:gender>"
-                    item_xml += f"\n            <g:age_group>adult</g:age_group>"
-                    
+                    item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml += "\n        </item>"
                 xml_items.append(item_xml)
 
