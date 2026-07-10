@@ -23,29 +23,42 @@ session.headers.update({
 })
 
 # ==========================================
-# DICCIONARIO ESTRICTO DE CLASIFICACIÓN
+# DICCIONARIO ESTRICTO DE PLANTILLAS
 # ==========================================
-# Mapea los tipos de plantilla/etiquetas internas de Fourthwall a Google Product Categories
 CATEGORIAS_FOURTHWALL = {
     # ROPA (is_apparel: True)
     "shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "t-shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "camiseta": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "hoodie": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "sweatshirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "tank top": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "sudadera": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "apparel": {"gpc": "Apparel & Accessories > Clothing", "is_apparel": True},
     
-    # HOGAR Y ACCESORIOS (is_apparel: False)
+    # TAZAS Y HOGAR (is_apparel: False)
     "mug": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
+    "taza": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
+    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware", "is_apparel": False},
+
+    # STICKERS
     "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
+    "pegatina": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
+
+    # PAPELERÍA
     "notebook": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
     "journal": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+    "libreta": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+    "cuaderno": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+
+    # TECNOLOGÍA
     "laptop sleeve": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
+    "funda": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
+
+    # ARTE Y DECORACIÓN
     "poster": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
     "print": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
     "canvas": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False}
 }
 
-# Categoría por defecto de seguridad si Fourthwall crea un producto totalmente nuevo que no esté en el diccionario
 CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories", "is_apparel": True} 
 
 def safe_escape(val):
@@ -84,30 +97,29 @@ def get_all_products():
             print(f"❌ Error API: {response.status_code}")
             break
             
-    print(f"✅ Total de productos en la tienda: {len(products)}")
     return products
 
 def get_exact_classification(product):
-    """
-    Clasifica el producto leyendo estrictamente los datos de la plataforma, NO el título.
-    """
-    # 1. Buscamos el tipo de producto oficial en los metadatos de Fourthwall
-    fw_type = product.get('productType', '').lower()
+    """Clasificación estricta por plantilla y metadatos (Sin usar el título)"""
+    fields_to_check = []
     
-    # 2. Si no está en 'productType', buscamos en las etiquetas (tags) oficiales
-    tags = [tag.lower() for tag in product.get('tags', [])]
+    # Extraemos todos los metadatos posibles donde la API pueda enviar el tipo de plantilla
+    if product.get('productType'): fields_to_check.append(str(product.get('productType')).lower())
+    if product.get('type'): fields_to_check.append(str(product.get('type')).lower())
+    if product.get('category'): fields_to_check.append(str(product.get('category')).lower())
     
-    # Buscamos coincidencias exactas en nuestro diccionario
-    for key, data in CATEGORIAS_FOURTHWALL.items():
-        # Verificamos el tipo de producto oficial
-        if key in fw_type:
-            return data
-        # O verificamos los tags (Fourthwall suele etiquetar las plantillas, ej: "Mug")
-        if any(key in tag for tag in tags):
-            return data
-
-    # Si no se encuentra en el diccionario, aplicamos el default
-    return CATEGORIA_DEFAULT
+    tags = product.get('tags', [])
+    if isinstance(tags, list):
+        for t in tags: fields_to_check.append(str(t).lower())
+            
+    # Comprobamos estrictamente contra el diccionario
+    for field in fields_to_check:
+        for key, data in CATEGORIAS_FOURTHWALL.items():
+            if key == field or key in field:
+                return data, field # Clasificación encontrada
+                
+    # Si la API no envió la plantilla, devolvemos default
+    return CATEGORIA_DEFAULT, None
 
 def build_xml_feed():
     products = get_all_products()
@@ -122,14 +134,18 @@ def build_xml_feed():
         title = product.get('name', 'Producto sin nombre')
         slug = product.get('slug', '')
         
+        classification, matched_term = get_exact_classification(product)
+        
+        # Sistema de alerta en consola
+        if matched_term:
+            print(f"✔️ [{title}] -> Plantilla detectada: '{matched_term}' -> {classification['gpc']}")
+        else:
+            print(f"⚠️ [{title}] -> La API no envió datos de plantilla/etiqueta. Asignado a Ropa por defecto.")
+
         raw_description = product.get('description', '')
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description: clean_description = title
-
         product_link = f"{STORE_URL}/products/{slug}"
-        
-        # <<< LLAMADA AL NUEVO MOTOR ESTRICTO >>>
-        classification = get_exact_classification(product)
 
         raw_images = product.get('images', [])
         all_image_urls = []
