@@ -6,23 +6,20 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 # ==========================================
-# CONFIGURACIÓN (Lee las credenciales de GitHub Secrets)
+# CONFIGURACIÓN
 # ==========================================
 API_USER = os.environ.get('FOURTHWALL_API_USER')
 API_PASS = os.environ.get('FOURTHWALL_API_PASS')
-
-# ¡IMPORTANTE! Cambia esto por la URL real de tu tienda:
 STORE_URL = 'https://tu-tienda.fourthwall.com' 
-
-# URL corregida para la Open API de Fourthwall
 BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 
-# Configuración de sesión y reintentos automáticos
+# Activar depuración detallada
+DEBUG_MODE = True
+
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 429, 500, 502, 503, 504 ])
 session.mount('https://', HTTPAdapter(max_retries=retries))
 
-# >>> SOLUCIÓN: Autenticación Basic Auth (Usuario y Contraseña) <<<
 session.auth = (API_USER, API_PASS)
 session.headers.update({
     'Content-Type': 'application/json',
@@ -30,7 +27,6 @@ session.headers.update({
 })
 
 def get_all_products():
-    """Obtiene todos los productos paginados."""
     products = []
     page = 1
     total_pages = 1
@@ -38,13 +34,44 @@ def get_all_products():
     
     while page <= total_pages:
         url = f"{BASE_API_URL}/products?page={page}&limit=50"
+        
+        if DEBUG_MODE:
+            print(f"\n[DEBUG] ----------------------------------------")
+            print(f"[DEBUG] Ejecutando GET a: {url}")
+            print(f"[DEBUG] Usuario usado: {'SI' if API_USER else 'NO'}, Password usado: {'SI' if API_PASS else 'NO'}")
+            
         response = session.get(url)
         
+        if DEBUG_MODE:
+            print(f"[DEBUG] Código de estado HTTP: {response.status_code}")
+            # Imprimimos los primeros 1000 caracteres de la respuesta cruda para ver qué devuelve
+            print(f"[DEBUG] Respuesta cruda: {response.text[:1000]}")
+            print(f"[DEBUG] ----------------------------------------\n")
+        
         if response.status_code == 200:
-            data = response.json()
-            products.extend(data.get('data', []))
-            total_pages = data.get('pagination', {}).get('total_pages', 1)
-            page += 1
+            try:
+                data = response.json()
+                
+                # Intentamos extraer los productos. A veces la API usa 'results' en lugar de 'data'
+                items = data.get('data', [])
+                if not items and 'results' in data:
+                    items = data.get('results', [])
+                elif not items and isinstance(data, list):
+                    items = data # Por si la API devuelve la lista directamente
+                    
+                if DEBUG_MODE: 
+                    print(f"[DEBUG] Claves del JSON devuelto: {list(data.keys()) if isinstance(data, dict) else 'Es una lista directa'}")
+                    print(f"[DEBUG] Se encontraron {len(items)} productos en la página {page}.")
+                
+                products.extend(items)
+                
+                # Manejo seguro de la paginación
+                pagination = data.get('pagination', {})
+                total_pages = pagination.get('total_pages', 1) if isinstance(pagination, dict) else 1
+                page += 1
+            except Exception as e:
+                print(f"❌ [DEBUG] Error procesando el JSON de respuesta: {e}")
+                break
         else:
             print(f"❌ Error API: {response.status_code} al llamar a {url}")
             print(f"Detalle: {response.text}")
@@ -53,7 +80,6 @@ def get_all_products():
     return products
 
 def categorize_product(title, tags, template_category):
-    """Categorización inteligente para Google / Pinterest."""
     search_string = f"{title} {' '.join(tags)} {template_category}".lower()
     category = "Apparel & Accessories"
     gender = "unisex"
@@ -79,6 +105,10 @@ def build_xml_feed():
 
     for product in products:
         product_id = product.get('id')
+        
+        if DEBUG_MODE:
+            print(f"[DEBUG] Procesando producto ID: {product_id}")
+            
         details = session.get(f"{BASE_API_URL}/products/{product_id}").json().get('data', {})
         template_id = details.get('template_id')
         template = session.get(f"{BASE_API_URL}/product-templates/{template_id}").json().get('data', {}) if template_id else {}
@@ -107,7 +137,6 @@ def build_xml_feed():
             price_str = f"{price_info.get('value', 0)} {price_info.get('currency', 'USD')}"
             full_title = f"{title} - {variant.get('name', '')}" if variant.get('name', '') else title
 
-            # Crear nodo XML
             item_xml = f"""
         <item>
             <g:id>{escape(variant_id)}</g:id>
