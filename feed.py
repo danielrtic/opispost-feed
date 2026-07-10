@@ -22,6 +22,32 @@ session.headers.update({
     'Accept': 'application/json'
 })
 
+# ==========================================
+# DICCIONARIO ESTRICTO DE CLASIFICACIÓN
+# ==========================================
+# Mapea los tipos de plantilla/etiquetas internas de Fourthwall a Google Product Categories
+CATEGORIAS_FOURTHWALL = {
+    # ROPA (is_apparel: True)
+    "shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "t-shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "hoodie": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "sweatshirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    "tank top": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
+    
+    # HOGAR Y ACCESORIOS (is_apparel: False)
+    "mug": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
+    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
+    "notebook": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+    "journal": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+    "laptop sleeve": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
+    "poster": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
+    "print": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
+    "canvas": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False}
+}
+
+# Categoría por defecto de seguridad si Fourthwall crea un producto totalmente nuevo que no esté en el diccionario
+CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories", "is_apparel": True} 
+
 def safe_escape(val):
     if not val: return ""
     if isinstance(val, dict): val = val.get('name', val.get('value', str(val)))
@@ -61,48 +87,27 @@ def get_all_products():
     print(f"✅ Total de productos en la tienda: {len(products)}")
     return products
 
-def categorize_product(title):
+def get_exact_classification(product):
     """
-    Motor inteligente ampliado para Opispot.
-    Clasifica los productos según la taxonomía oficial de Google.
+    Clasifica el producto leyendo estrictamente los datos de la plataforma, NO el título.
     """
-    search = title.lower()
+    # 1. Buscamos el tipo de producto oficial en los metadatos de Fourthwall
+    fw_type = product.get('productType', '').lower()
     
-    # Valores por defecto (asumimos que NO es ropa hasta que se demuestre lo contrario, 
-    # es más seguro para evitar baneos en Pinterest)
-    is_apparel = False
-    gender = ""
-    age_group = ""
-    category = "Home & Garden" 
+    # 2. Si no está en 'productType', buscamos en las etiquetas (tags) oficiales
+    tags = [tag.lower() for tag in product.get('tags', [])]
+    
+    # Buscamos coincidencias exactas en nuestro diccionario
+    for key, data in CATEGORIAS_FOURTHWALL.items():
+        # Verificamos el tipo de producto oficial
+        if key in fw_type:
+            return data
+        # O verificamos los tags (Fourthwall suele etiquetar las plantillas, ej: "Mug")
+        if any(key in tag for tag in tags):
+            return data
 
-    # 1. Tazas
-    if any(word in search for word in ['taza', 'mug']):
-        category = 'Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs'
-    
-    # 2. Stickers / Pegatinas
-    elif any(word in search for word in ['sticker', 'pegatina']):
-        category = 'Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers'
-    
-    # 3. Libretas / Cuadernos
-    elif any(word in search for word in ['libreta', 'notebook', 'cuaderno']):
-        category = 'Office Supplies > Office Instruments > Notebooks & Notepads'
-    
-    # 4. Fundas para Portátil / Móvil
-    elif any(word in search for word in ['funda', 'case', 'portátil']):
-        category = 'Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases'
-    
-    # 5. Ropa (Camisetas, Sudaderas, etc.)
-    elif any(word in search for word in ['camiseta', 'shirt', 'sudadera', 'hoodie']):
-        category = 'Apparel & Accessories > Clothing > Shirts & Tops'
-        is_apparel = True
-        gender = 'unisex'
-        age_group = 'adult'
-        
-    # 6. Pósters / Cuadros
-    elif any(word in search for word in ['poster', 'print', 'lienzo']):
-        category = 'Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork'
-    
-    return {'gpc': category, 'gender': gender, 'age_group': age_group, 'is_apparel': is_apparel}
+    # Si no se encuentra en el diccionario, aplicamos el default
+    return CATEGORIA_DEFAULT
 
 def build_xml_feed():
     products = get_all_products()
@@ -117,15 +122,15 @@ def build_xml_feed():
         title = product.get('name', 'Producto sin nombre')
         slug = product.get('slug', '')
         
-        # Limpieza de descripción
         raw_description = product.get('description', '')
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description: clean_description = title
 
         product_link = f"{STORE_URL}/products/{slug}"
-        classification = categorize_product(title)
+        
+        # <<< LLAMADA AL NUEVO MOTOR ESTRICTO >>>
+        classification = get_exact_classification(product)
 
-        # Extracción de imágenes
         raw_images = product.get('images', [])
         all_image_urls = []
         for img in raw_images:
@@ -156,8 +161,10 @@ def build_xml_feed():
             <g:condition>new</g:condition>
             <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
             
-            if classification['gender']: item_xml += f"\n            <g:gender>{safe_escape(classification['gender'])}</g:gender>"
-            if classification['age_group']: item_xml += f"\n            <g:age_group>{safe_escape(classification['age_group'])}</g:age_group>"
+            if classification['is_apparel']:
+                item_xml += f"\n            <g:gender>unisex</g:gender>"
+                item_xml += f"\n            <g:age_group>adult</g:age_group>"
+                
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
         else:
@@ -170,7 +177,6 @@ def build_xml_feed():
                 if variant_price_str == "0.00 USD": variant_price_str = base_price_str
                 
                 attributes = variant.get('attributes', {})
-                # Ahora extraemos color y talla siempre que existan, ayuda a Pinterest a diferenciar (ej: Taza 11oz vs 15oz)
                 color = attributes.get('color', attributes.get('Color', ''))
                 size = attributes.get('size', attributes.get('Size', ''))
 
@@ -188,8 +194,11 @@ def build_xml_feed():
                 
                 if color: item_xml += f"\n            <g:color>{safe_escape(color)}</g:color>"
                 if size: item_xml += f"\n            <g:size>{safe_escape(size)}</g:size>"
-                if classification['gender']: item_xml += f"\n            <g:gender>{safe_escape(classification['gender'])}</g:gender>"
-                if classification['age_group']: item_xml += f"\n            <g:age_group>{safe_escape(classification['age_group'])}</g:age_group>"
+                
+                if classification['is_apparel']:
+                    item_xml += f"\n            <g:gender>unisex</g:gender>"
+                    item_xml += f"\n            <g:age_group>adult</g:age_group>"
+                    
                 item_xml += "\n        </item>"
                 xml_items.append(item_xml)
 
