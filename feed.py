@@ -16,7 +16,7 @@ BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 429, 500, 502, 503, 504 ])
 session.mount('https://', HTTPAdapter(max_retries=retries))
-session.auth = (API_USER, API_PASS)
+session.auth = (API_USER, API_PASS)[cite: 2]
 session.headers.update({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -40,39 +40,31 @@ def safe_escape(val):
     return escape(str(val))
 
 def clean_title_text(text):
-    """Elimina de forma limpia prefijos de duplicación como 'Copy of'"""
     if not text: return ""
     cleaned = text.replace("Copy of ", "").replace("Copy of", "")
     return cleaned.strip()
 
 def extract_availability(product_state, variant_stock):
-    """Calcula disponibilidad usando los esquemas de Fourthwall"""
-    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
+    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':[cite: 1]
         return 'out of stock'
     if isinstance(variant_stock, dict):
-        stock_type = variant_stock.get('type')
-        if stock_type == 'UNLIMITED': 
-            return 'in stock'
-        if stock_type == 'LIMITED':
-            return 'in stock' if variant_stock.get('inStock', 0) > 0 else 'out of stock'
+        stock_type = variant_stock.get('type')[cite: 1]
+        if stock_type == 'UNLIMITED': return 'in stock'[cite: 1]
+        if stock_type == 'LIMITED':[cite: 1]
+            return 'in stock' if variant_stock.get('inStock', 0) > 0 else 'out of stock'[cite: 1]
     return 'in stock'
 
 def extract_price(data_dict):
-    """Busca el precio en el formato 'unitPrice' de la variante"""
     if not data_dict or not isinstance(data_dict, dict): return "0.00 USD"
-    
-    price_obj = data_dict.get('unitPrice') or data_dict.get('price')
+    price_obj = data_dict.get('unitPrice') or data_dict.get('price')[cite: 1]
     if isinstance(price_obj, dict):
-        val = price_obj.get('value', price_obj.get('amount', '0.00'))
-        curr = price_obj.get('currency', price_obj.get('currencyCode', 'USD'))
+        val = price_obj.get('value', price_obj.get('amount', '0.00'))[cite: 1]
+        curr = price_obj.get('currency', price_obj.get('currencyCode', 'USD'))[cite: 1]
         return f"{val} {curr}"
     return "0.00 USD"
 
 def clasificar_producto(variant, title):
-    """Filtro Híbrido Avanzado: Prioridad absoluta a palabras clave del título"""
     t = title.lower()
-    
-    # 1. PRIORIDAD MÁXIMA: Palabras clave inequívocas en el título para evitar falsos positivos
     if any(w in t for w in ['sticker', 'pegatina']): return CATEGORIAS["sticker"], "Título (Sticker)"
     if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza/Mug)"
     if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
@@ -80,53 +72,38 @@ def clasificar_producto(variant, title):
     if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro', 'canvas']): return CATEGORIAS["art"], "Título (Arte)"
     if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa']): return CATEGORIAS["apparel"], "Título (Ropa)"
 
-    # 2. RESPALDO: Filtro por Atributos Físicos de la variante (Estructura estricta del esquema)
-    attrs = variant.get('attributes', {})
-    size_obj = attrs.get('size', {})
-    size_name = ""
-    if isinstance(size_obj, dict):
-        size_name = str(size_obj.get('name', '')).lower().strip()
-    else:
-        size_name = str(size_obj).lower().strip()
+    attrs = variant.get('attributes', {})[cite: 1]
+    size_obj = attrs.get('size', {})[cite: 1]
+    size_name = str(size_obj.get('name', '')).lower().strip() if isinstance(size_obj, dict) else str(size_obj).lower().strip()[cite: 1]
             
     if size_name:
-        if 'oz' in size_name or 'onza' in size_name: 
-            return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
-        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: 
-            return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
-        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): 
-            return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
+        if 'oz' in size_name or 'onza' in size_name: return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
+        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
+        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
 
     return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def get_all_products_summary():
-    """Descarga de productos empezando desde la página 0 obligatoria"""
     products = []
     page = 0 
     total_pages = 1
     print("📦 Conectando a Open API y descargando catálogo completo...")
     
     while page < total_pages:
-        url = f"{BASE_API_URL}/products?page={page}&size=50"
+        url = f"{BASE_API_URL}/products?page={page}&size=50"[cite: 2]
         print(f"-> Descargando página {page}...")
         
         response = session.get(url)
         if response.status_code == 200:
             data = response.json()
-            items = data.get('results', [])
-            
-            if not items:
-                break
-                
+            items = data.get('results', [])[cite: 2]
+            if not items: break
             products.extend(items)
-            print(f"   + {len(items)} productos base encontrados.")
-            
-            total_pages = data.get('totalPages', 1)
+            total_pages = data.get('totalPages', 1)[cite: 2]
             page += 1
         else:
-            print(f"❌ Error API listando productos en la página {page}: {response.status_code} - {response.text}")
+            print(f"❌ Error API listando productos: {response.status_code}")
             break
-            
     return products
 
 def build_xml_feed():
@@ -136,35 +113,50 @@ def build_xml_feed():
         return
 
     xml_items = []
-    print(f"\n🔍 Procesando y filtrando títulos de {len(summary_products)} productos base...")
+    print(f"\n🔍 Procesando {len(summary_products)} productos base...")
 
     for summary in summary_products:
-        product_id = summary.get('id')
-        raw_title = summary.get('name', 'Producto sin nombre')
-        
-        # Limpiamos el título principal aquí
+        product_id = summary.get('id')[cite: 1]
+        raw_title = summary.get('name', 'Producto sin nombre')[cite: 1]
         title = clean_title_text(raw_title)
-        slug = summary.get('slug', '')
+        slug = summary.get('slug', '')[cite: 1]
         
-        url_detail = f"{BASE_API_URL}/products/{product_id}"
+        url_detail = f"{BASE_API_URL}/products/{product_id}"[cite: 2]
         resp_detail = session.get(url_detail)
         detailed_product = resp_detail.json() if resp_detail.status_code == 200 else summary
 
-        raw_description = detailed_product.get('description', '')
+        # ---------------------------------------------------------
+        # >>> NUEVOS FILTROS DE SEGURIDAD <<<
+        # ---------------------------------------------------------
+        
+        # 1. Verificar el acceso (ignorar HIDDEN, PRIVATE, ARCHIVED)
+        access_info = detailed_product.get('access', {})[cite: 1]
+        access_type = access_info.get('type', 'PUBLIC') if isinstance(access_info, dict) else 'PUBLIC'[cite: 1]
+        
+        if access_type != 'PUBLIC':
+            print(f"🚫 Omitiendo [{title[:30]}...] -> No es público ({access_type})")
+            continue
+
+        raw_images = detailed_product.get('images', [])[cite: 1]
+        all_image_urls = []
+        for img in raw_images:
+            img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""[cite: 1]
+            if img_url and img_url not in all_image_urls: all_image_urls.append(img_url)
+
+        # 2. Verificar que el producto tenga al menos una imagen
+        if not all_image_urls:
+            print(f"🚫 Omitiendo [{title[:30]}...] -> Sin imágenes (Borrador/Error)")
+            continue
+            
+        # ---------------------------------------------------------
+
+        raw_description = detailed_product.get('description', '')[cite: 1]
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description: clean_description = title
         product_link = f"{STORE_URL}/products/{slug}"
         
-        product_state = detailed_product.get('state', {})
-
-        raw_images = detailed_product.get('images', [])
-        all_image_urls = []
-        for img in raw_images:
-            img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
-            if img_url and img_url not in all_image_urls:
-                all_image_urls.append(img_url)
-
-        variants = detailed_product.get('variants', [])
+        product_state = detailed_product.get('state', {})[cite: 1]
+        variants = detailed_product.get('variants', [])[cite: 1]
         base_price_str = extract_price(detailed_product)
 
         if not variants:
@@ -194,40 +186,37 @@ def build_xml_feed():
                 item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
+            print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
         else:
             for variant in variants:
-                variant_id = variant.get('id', product_id)
-                raw_v_name = variant.get('name', '')
-                
-                # Limpiamos también el nombre de la variante por si acaso
+                variant_id = variant.get('id', product_id)[cite: 1]
+                raw_v_name = variant.get('name', '')[cite: 1]
                 v_name = clean_title_text(raw_v_name)
+                
                 full_title = f"{title} - {v_name}" if v_name else title
                 
                 classification, razon = clasificar_producto(variant, title)
-                print(f"✔️ [{full_title[:35]}...] -> Procesado correctamente")
                 
                 variant_price_str = extract_price(variant)
                 if variant_price_str == "0.00 USD": variant_price_str = base_price_str
                 
-                availability = extract_availability(product_state, variant.get('stock'))
+                availability = extract_availability(product_state, variant.get('stock'))[cite: 1]
                 
-                attributes = variant.get('attributes', {})
+                attributes = variant.get('attributes', {})[cite: 1]
                 color_name = ""
-                color_obj = attributes.get('color')
-                if isinstance(color_obj, dict): 
-                    color_name = color_obj.get('name', '')
+                color_obj = attributes.get('color')[cite: 1]
+                if isinstance(color_obj, dict): color_name = color_obj.get('name', '')[cite: 1]
                 
                 size_name = ""
-                size_obj = attributes.get('size')
-                if isinstance(size_obj, dict): 
-                    size_name = size_obj.get('name', '')
+                size_obj = attributes.get('size')[cite: 1]
+                if isinstance(size_obj, dict): size_name = size_obj.get('name', '')[cite: 1]
 
-                sku = variant.get('sku', '')
-                weight = variant.get('weight', {})
-                weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
+                sku = variant.get('sku', '')[cite: 1]
+                weight = variant.get('weight', {})[cite: 1]
+                weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""[cite: 1]
 
-                var_thumb = variant.get('thumbnailImage', {})
-                main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else (all_image_urls[0] if all_image_urls else "")
+                var_thumb = variant.get('thumbnailImage', {})[cite: 1]
+                main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else (all_image_urls[0] if all_image_urls else "")[cite: 1]
 
                 item_xml = f"""
         <item>
@@ -258,6 +247,7 @@ def build_xml_feed():
                     item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml += "\n        </item>"
                 xml_items.append(item_xml)
+            print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
             
         time.sleep(0.05)
 
