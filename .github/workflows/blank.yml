@@ -31,8 +31,9 @@ jobs:
 
       - name: Ejecutar script generador
         env:
-          # Aquí llamamos a la clave secreta que configuraremos en el siguiente paso
-          FOURTHWALL_API_KEY: ${{ secrets.FOURTHWALL_API_KEY }}
+          # Inyecta el usuario y contraseña desde los Secrets de GitHub
+          FOURTHWALL_API_USER: ${{ secrets.FOURTHWALL_API_USER }}
+          FOURTHWALL_API_PASS: ${{ secrets.FOURTHWALL_API_PASS }}
         run: python feed.py
 
       - name: Hacer Commit y Push del nuevo XML
