@@ -1,6 +1,7 @@
 import requests
 import time
 import os
+import html
 from xml.sax.saxutils import escape
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -41,7 +42,8 @@ def safe_escape(val):
 
 def clean_title_text(text):
     if not text: return ""
-    cleaned = text.replace("Copy of ", "").replace("Copy of", "")
+    decoded_text = html.unescape(text)
+    cleaned = decoded_text.replace("Copy of ", "").replace("Copy of", "")
     return cleaned.strip()
 
 def extract_availability(product_state, variant_stock):
@@ -145,9 +147,9 @@ def build_xml_feed():
         access_type = access_info.get('type', 'PUBLIC') if isinstance(access_info, dict) else 'PUBLIC'
         
         if access_type != 'PUBLIC':
-            print(f"🚫 Omitiendo [{title[:30]}...] -> No es público ({access_type})")
             continue
 
+        # Galería base del producto (Como respaldo)
         raw_images = detailed_product.get('images', [])
         all_image_urls = []
         for img in raw_images:
@@ -155,7 +157,6 @@ def build_xml_feed():
             if img_url and img_url not in all_image_urls: all_image_urls.append(img_url)
 
         if not all_image_urls:
-            print(f"🚫 Omitiendo [{title[:30]}...] -> Sin imágenes (Borrador/Error)")
             continue
 
         raw_description = detailed_product.get('description', '')
@@ -194,14 +195,17 @@ def build_xml_feed():
                 item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
-            print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
         else:
             for variant in variants:
                 variant_id = variant.get('id', product_id)
                 raw_v_name = variant.get('name', '')
+                
                 v_name = clean_title_text(raw_v_name)
                 
-                full_title = f"{title} - {v_name}" if v_name else title
+                if title.lower() in v_name.lower():
+                    full_title = v_name
+                else:
+                    full_title = f"{title} - {v_name}" if v_name else title
                 
                 classification, razon = clasificar_producto(variant, title)
                 
@@ -223,8 +227,25 @@ def build_xml_feed():
                 weight = variant.get('weight', {})
                 weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
 
+                # ==========================================
+                # CORRECCIÓN DE IMÁGENES POR VARIANTE
+                # ==========================================
+                raw_var_images = variant.get('images', [])
+                var_image_urls = []
+                for img in raw_var_images:
+                    img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
+                    if img_url and img_url not in var_image_urls: 
+                        var_image_urls.append(img_url)
+
                 var_thumb = variant.get('thumbnailImage', {})
-                main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else (all_image_urls[0] if all_image_urls else "")
+                main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else ""
+                
+                # Si la variante no tiene thumbnail, usamos su primera imagen. Si no tiene ninguna, usamos la del producto base.
+                if not main_image_link:
+                    main_image_link = var_image_urls[0] if var_image_urls else (all_image_urls[0] if all_image_urls else "")
+                
+                # Para las adicionales, usamos estrictamente las de la variante si tiene. Si no, las generales.
+                images_to_use = var_image_urls if var_image_urls else all_image_urls
 
                 item_xml = f"""
         <item>
@@ -235,7 +256,7 @@ def build_xml_feed():
             <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
                 
-                for add_img in all_image_urls[1:11]:
+                for add_img in images_to_use[:11]:
                     if add_img != main_image_link: 
                         item_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
 
