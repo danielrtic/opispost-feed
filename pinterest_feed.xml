@@ -25,7 +25,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>S</g:size>
         </item>
         <item>
             <g:id>48aa92b4-5706-4080-a573-240bef3471ec</g:id>
@@ -47,7 +49,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>M</g:size>
         </item>
         <item>
             <g:id>403ce97b-1ac2-4ba9-8a37-17df7ca18212</g:id>
@@ -69,7 +73,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>L</g:size>
         </item>
         <item>
             <g:id>d8bcfa53-9044-4919-a930-708994b6f2ac</g:id>
@@ -91,7 +97,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>XL</g:size>
         </item>
         <item>
             <g:id>c0f6f9cf-e09d-46b4-b9c2-f3bdec945f83</g:id>
@@ -113,7 +121,9 @@
             <g:price>26.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>2XL</g:size>
         </item>
         <item>
             <g:id>d368a39b-6d11-4c87-b3cb-612156ec72b9</g:id>
@@ -135,7 +145,9 @@
             <g:price>28.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>3XL</g:size>
         </item>
         <item>
             <g:id>406851c6-f89a-47ea-82cf-d5e14c2a118b</g:id>
@@ -157,7 +169,9 @@
             <g:price>30.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Black</g:color>
+            <g:size>4XL</g:size>
         </item>
         <item>
             <g:id>93b7f855-a44b-44b7-894b-7e25ad761f0f</g:id>
@@ -179,7 +193,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>S</g:size>
         </item>
         <item>
             <g:id>e7d74309-aeda-42df-91fc-4483c296bff7</g:id>
@@ -201,7 +217,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>M</g:size>
         </item>
         <item>
             <g:id>e16188f3-11ad-44c5-8d5a-8169e471e709</g:id>
@@ -223,7 +241,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>L</g:size>
         </item>
         <item>
             <g:id>452cbe09-5fa4-4a8a-a466-4d27c1c09605</g:id>
@@ -245,7 +265,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>XL</g:size>
         </item>
         <item>
             <g:id>7f48efbe-b1ec-40d7-ab4e-c969cb8efdcb</g:id>
@@ -267,7 +289,9 @@
             <g:price>26.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>2XL</g:size>
         </item>
         <item>
             <g:id>f8f6aa81-bcba-4735-8ff2-24c497801b85</g:id>
@@ -289,7 +313,9 @@
             <g:price>28.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>3XL</g:size>
         </item>
         <item>
             <g:id>c73ab743-b0fe-4ed3-94a6-65c7958759d5</g:id>
@@ -311,7 +337,9 @@
             <g:price>30.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>True Navy</g:color>
+            <g:size>4XL</g:size>
         </item>
         <item>
             <g:id>a4b98e64-4f4b-45af-9915-5cd629c4b5b3</g:id>
@@ -333,7 +361,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>S</g:size>
         </item>
         <item>
             <g:id>bb26080a-e856-4cad-bd99-961326c83c0b</g:id>
@@ -355,7 +385,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>M</g:size>
         </item>
         <item>
             <g:id>2fad07d3-5793-4587-8848-0669a6fed743</g:id>
@@ -377,7 +409,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>L</g:size>
         </item>
         <item>
             <g:id>9a775db5-7a6e-4984-b049-d8211afa2bc4</g:id>
@@ -399,7 +433,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>XL</g:size>
         </item>
         <item>
             <g:id>6e557686-96e3-4c73-aa88-8ce37c9eb67c</g:id>
@@ -421,7 +457,9 @@
             <g:price>26.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>2XL</g:size>
         </item>
         <item>
             <g:id>be752615-3a9f-43d2-9b74-882f31be9694</g:id>
@@ -443,7 +481,9 @@
             <g:price>28.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>3XL</g:size>
         </item>
         <item>
             <g:id>b5c9dc21-61e6-4d7b-9575-c081533c099a</g:id>
@@ -465,7 +505,9 @@
             <g:price>30.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Graphite</g:color>
+            <g:size>4XL</g:size>
         </item>
         <item>
             <g:id>2ba59a2c-fb23-4242-b720-f1bd5cc73b61</g:id>
@@ -487,7 +529,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>S</g:size>
         </item>
         <item>
             <g:id>78e96ca3-ef8b-4f6c-aee5-99adde9d48d6</g:id>
@@ -509,7 +553,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>M</g:size>
         </item>
         <item>
             <g:id>53c47a14-f2f0-4f19-be63-e61603d36029</g:id>
@@ -531,7 +577,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>L</g:size>
         </item>
         <item>
             <g:id>a3e394b1-d5fd-4ace-b8a8-d287dc6146df</g:id>
@@ -553,7 +601,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>XL</g:size>
         </item>
         <item>
             <g:id>611f992c-621a-490a-a870-800290edec10</g:id>
@@ -575,7 +625,9 @@
             <g:price>26.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>2XL</g:size>
         </item>
         <item>
             <g:id>c509b9bd-47b7-4187-857b-cd0b4252bb8e</g:id>
@@ -597,7 +649,9 @@
             <g:price>28.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>3XL</g:size>
         </item>
         <item>
             <g:id>edb22662-27b7-4d3c-879a-46e8a77f9d90</g:id>
@@ -619,7 +673,9 @@
             <g:price>30.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Navy</g:color>
+            <g:size>4XL</g:size>
         </item>
         <item>
             <g:id>53906880-6fbd-4459-b25a-e5ae9f0ab0f3</g:id>
@@ -641,7 +697,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>S</g:size>
         </item>
         <item>
             <g:id>307cdc4f-2607-4291-a8c7-65e64e443c71</g:id>
@@ -663,7 +721,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>M</g:size>
         </item>
         <item>
             <g:id>a30fb8fe-66f0-47a4-b11b-cf7639dc520b</g:id>
@@ -685,7 +745,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>L</g:size>
         </item>
         <item>
             <g:id>feb847f8-23ac-4599-ae8c-38e6ab7bc8be</g:id>
@@ -707,7 +769,9 @@
             <g:price>24.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>XL</g:size>
         </item>
         <item>
             <g:id>cebbe5ef-0408-4d28-9075-ca7738277487</g:id>
@@ -729,7 +793,9 @@
             <g:price>26.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>2XL</g:size>
         </item>
         <item>
             <g:id>0bf5cad1-e9c8-41f2-8270-5943aa2c9591</g:id>
@@ -751,7 +817,9 @@
             <g:price>28.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>3XL</g:size>
         </item>
         <item>
             <g:id>623175cb-e98a-4f5c-951d-56538419453d</g:id>
@@ -773,7 +841,9 @@
             <g:price>30.99 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Home &amp; Garden &gt; Decor &gt; Artwork &gt; Posters, Prints, &amp; Visual Artwork</g:google_product_category>
+            <g:google_product_category>Home &amp; Garden</g:google_product_category>
+            <g:color>Midnight</g:color>
+            <g:size>4XL</g:size>
         </item>
         <item>
             <g:id>bc7b0f87-9c82-4feb-ada9-36add648d203</g:id>
@@ -796,7 +866,7 @@ Este </g:description>
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -823,7 +893,7 @@ Este </g:description>
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -850,7 +920,7 @@ Este </g:description>
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -877,7 +947,7 @@ Este </g:description>
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -904,7 +974,7 @@ Este </g:description>
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -931,7 +1001,7 @@ Este </g:description>
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -961,7 +1031,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -991,7 +1061,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1021,7 +1091,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1051,7 +1121,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1081,7 +1151,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1111,7 +1181,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1141,7 +1211,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -1171,7 +1241,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1201,7 +1271,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1231,7 +1301,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1261,7 +1331,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1291,7 +1361,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Kelly Green</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1321,7 +1391,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -1351,7 +1421,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1381,7 +1451,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1411,7 +1481,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1441,7 +1511,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1471,7 +1541,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Sand</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1501,7 +1571,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -1531,7 +1601,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1561,7 +1631,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1591,7 +1661,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1621,7 +1691,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1651,7 +1721,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1681,7 +1751,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -1711,7 +1781,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1741,7 +1811,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1771,7 +1841,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1801,7 +1871,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1831,7 +1901,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1861,7 +1931,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -1891,7 +1961,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -1921,7 +1991,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -1951,7 +2021,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -1981,7 +2051,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2011,7 +2081,7 @@ Perfecta para relajarte en casa, salir a tu cafetería favorita o como el &lt;b&
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2041,7 +2111,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2071,7 +2141,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -2101,7 +2171,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -2131,7 +2201,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2161,7 +2231,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2191,7 +2261,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2221,7 +2291,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2251,7 +2321,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -2281,7 +2351,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -2311,7 +2381,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2341,7 +2411,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2371,7 +2441,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Light Blue</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2401,7 +2471,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2431,7 +2501,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -2461,7 +2531,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -2491,7 +2561,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2521,7 +2591,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2551,7 +2621,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Daisy</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2581,7 +2651,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2611,7 +2681,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -2641,7 +2711,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -2671,7 +2741,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2701,7 +2771,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2731,7 +2801,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Cornsilk</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2761,7 +2831,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2791,7 +2861,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -2821,7 +2891,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -2851,7 +2921,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2881,7 +2951,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2911,7 +2981,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Natural</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -2941,7 +3011,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -2971,7 +3041,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -3001,7 +3071,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -3031,7 +3101,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3061,7 +3131,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3091,7 +3161,7 @@ Te presentamos al auténtico &lt;b&gt;&amp;#34;Carabao Master&amp;#34;&lt;/b&gt;
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3119,7 +3189,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -3147,7 +3217,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -3175,7 +3245,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -3203,7 +3273,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3231,7 +3301,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3259,7 +3329,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Black</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3287,7 +3357,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -3315,7 +3385,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -3343,7 +3413,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -3371,7 +3441,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3399,7 +3469,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3427,7 +3497,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>White</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3455,7 +3525,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -3483,7 +3553,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -3511,7 +3581,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -3539,7 +3609,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3567,7 +3637,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3595,7 +3665,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Heather Indigo</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3623,7 +3693,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>S</g:size>
             <g:gender>unisex</g:gender>
@@ -3651,7 +3721,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>M</g:size>
             <g:gender>unisex</g:gender>
@@ -3679,7 +3749,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>L</g:size>
             <g:gender>unisex</g:gender>
@@ -3707,7 +3777,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>22.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3735,7 +3805,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>24.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>2XL</g:size>
             <g:gender>unisex</g:gender>
@@ -3763,7 +3833,7 @@ Esta pieza de &lt;i&gt;streetwear&lt;/i&gt; destaca por su ilustración de alta 
             <g:price>26.0 USD</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
+            <g:google_product_category>Apparel &amp; Accessories &gt; Clothing &gt; Shirts &amp; Tops</g:google_product_category>
             <g:color>Royal</g:color>
             <g:size>3XL</g:size>
             <g:gender>unisex</g:gender>
