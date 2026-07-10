@@ -24,7 +24,8 @@ session.headers.update({
 })
 
 CATEGORIAS = {
-    "apparel": {"gpc": "Apparel & Accessories > Clothing", "is_apparel": True},
+    # Pasamos de 2 niveles a 3 niveles ("Shirts & Tops")
+    "apparel": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
     "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
     "stationery": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
@@ -32,7 +33,8 @@ CATEGORIAS = {
     "accessories": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False}
 }
 
-CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories", "is_apparel": True}
+# Pasamos de 1 nivel a 3 niveles
+CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True}
 
 def safe_escape(val):
     if not val: return ""
