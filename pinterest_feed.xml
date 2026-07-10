@@ -6,68 +6,6 @@
         <description>Catálogo oficial de productos para Pinterest</description>
         
         <item>
-            <g:id>d60e1b9c-ddcc-4dd0-8342-26bf953abcad</g:id>
-            <g:item_group_id>513e6616-2fd8-4bb4-9df0-5a643180c4e9</g:item_group_id>
-            <g:title>New Product - New Product</g:title>
-            <g:description>New Product</g:description>
-            <g:link>https://opispot.com/products/new-product?variant=d60e1b9c-ddcc-4dd0-8342-26bf953abcad</g:link>
-            <g:image_link></g:image_link>
-            <g:price>30.0 USD</g:price>
-            <g:availability>out of stock</g:availability>
-            <g:condition>new</g:condition>
-            <g:brand>Opispot</g:brand>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-            <g:mpn>NQNR-XNX0000</g:mpn>
-            <g:shipping_weight>10.0 oz</g:shipping_weight>
-            <g:gender>unisex</g:gender>
-            <g:age_group>adult</g:age_group>
-        </item>
-        <item>
-            <g:id>6d8db5e6-c978-4c3e-8f35-0df0be1f1060</g:id>
-            <g:item_group_id>cd5e3a59-2130-4f84-8ee5-d3a1d4c604e0</g:item_group_id>
-            <g:title>Taza Ilustrada "Plant Mom" - Perezoso - Taza Ilustrada &amp;#34;Plant Mom&amp;#34; - Perezoso - Green, 11oz</g:title>
-            <g:description>&lt;i&gt;¡Para los amantes de las plantas y de tomarse la vida con calma! ☕&amp;#x1f331;&lt;/i&gt;
-&lt;i&gt;Disfruta de tus cafés, tés o de tu bebida favorita durante los directos con esta taza exclusiva de &amp;#34;Plant Mom&amp;#34;. Cuenta con una ilustración súper bonita de un adorable perezoso rodeado de sus plantas.&lt;/i&gt;
-&lt;i&gt;• Capacidad estándar de 11oz (unos 325 ml).&lt;/i&gt; &lt;i&gt;• Diseño con interior y asa en verde vibrante, a juego con la temática botánica.&lt;/i&gt; &lt;i&gt;• Cerámica resistente, apta para microondas y lavavajillas.&lt;</g:description>
-            <g:link>https://opispot.com/products/copy-of-taza-ilustrada-plant-mom-perezoso?variant=6d8db5e6-c978-4c3e-8f35-0df0be1f1060</g:link>
-            <g:image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/ae32f46b-27a1-4b68-ab08-6eaa9ff731e8.webp</g:image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/25e12a78-7067-4a16-ac98-7fab77974e7f.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/21e0c2af-64b5-4d35-8399-591387bdf5f0.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/9b3ffdff-64bb-4c39-9b9c-35586d8acee5.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/c52307d9-8ebf-472b-b8dd-91f7230423ef.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/d1a50420-b2f8-4e6e-b285-217296d0f6d5.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/af17a33f-68c4-47fd-b793-4a2d178809d2.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/0258b4aa-a1aa-47b1-8cb8-e13cbd679e3b.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/f5d2a2a5-00c1-4e57-a541-9a53b2649d46.webp</g:additional_image_link>
-            <g:additional_image_link>https://cdn.fourthwall.com/customizations/sh_e136408f-04c8-47b6-b2a0-25e2d0b8078a/c1e24e9c-0086-4852-a2b2-f688afec5d39.webp</g:additional_image_link>
-            <g:price>15.95 USD</g:price>
-            <g:availability>out of stock</g:availability>
-            <g:condition>new</g:condition>
-            <g:brand>Opispot</g:brand>
-            <g:google_product_category>Home &amp; Garden &gt; Kitchen &amp; Dining &gt; Tableware &gt; Drinkware &gt; Mugs</g:google_product_category>
-            <g:color>Green</g:color>
-            <g:size>11oz</g:size>
-            <g:mpn>NW5K-RQJ1011</g:mpn>
-            <g:shipping_weight>13.0 oz</g:shipping_weight>
-        </item>
-        <item>
-            <g:id>77e9a996-c905-441c-9589-757744375b23</g:id>
-            <g:item_group_id>3869f5a4-e228-4afe-91e6-e21afa73ba72</g:item_group_id>
-            <g:title>New Product - New Product</g:title>
-            <g:description>New Product</g:description>
-            <g:link>https://opispot.com/products/new-product?variant=77e9a996-c905-441c-9589-757744375b23</g:link>
-            <g:image_link></g:image_link>
-            <g:price>30.0 USD</g:price>
-            <g:availability>out of stock</g:availability>
-            <g:condition>new</g:condition>
-            <g:brand>Opispot</g:brand>
-            <g:google_product_category>Apparel &amp; Accessories</g:google_product_category>
-            <g:mpn>NMYJ-GB40000</g:mpn>
-            <g:shipping_weight>10.0 oz</g:shipping_weight>
-            <g:gender>unisex</g:gender>
-            <g:age_group>adult</g:age_group>
-        </item>
-        <item>
             <g:id>6a17ffae-9f12-4aee-a88e-065550472ff5</g:id>
             <g:item_group_id>c984af97-0bb7-435d-9d0f-5a4caceef023</g:item_group_id>
             <g:title>Funda para Portátil "La Luna Digital" - Funda para Portátil &amp;#34;La Luna Digital&amp;#34; - All-Over Print, 15″</g:title>
