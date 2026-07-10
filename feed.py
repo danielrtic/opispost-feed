@@ -26,34 +26,23 @@ session.headers.update({
 # DICCIONARIO ESTRICTO DE PLANTILLAS
 # ==========================================
 CATEGORIAS_FOURTHWALL = {
-    # ROPA (is_apparel: True)
     "shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "t-shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "camiseta": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "hoodie": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "sudadera": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "apparel": {"gpc": "Apparel & Accessories > Clothing", "is_apparel": True},
-    
-    # TAZAS Y HOGAR (is_apparel: False)
     "mug": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
     "taza": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
     "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware", "is_apparel": False},
-
-    # STICKERS
     "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
     "pegatina": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
-
-    # PAPELERÍA
     "notebook": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
     "journal": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
     "libreta": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
     "cuaderno": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-
-    # TECNOLOGÍA
     "laptop sleeve": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
     "funda": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False},
-
-    # ARTE Y DECORACIÓN
     "poster": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
     "print": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
     "canvas": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False}
@@ -77,11 +66,12 @@ def extract_price(data_dict):
         return f"{price_obj} USD"
     return "0.00 USD"
 
-def get_all_products():
+def get_all_products_summary():
+    """Obtiene la lista básica de IDs de productos."""
     products = []
     page = 1
     total_pages = 1
-    print("📦 Obteniendo catálogo completo...")
+    print("📦 Obteniendo lista base de productos...")
     
     while page <= total_pages:
         url = f"{BASE_API_URL}/products?page={page}&limit=50"
@@ -99,55 +89,73 @@ def get_all_products():
             
     return products
 
-def get_exact_classification(product):
-    """Clasificación estricta por plantilla y metadatos (Sin usar el título)"""
+def get_product_details(product_id):
+    """Deep Fetch: Pide la ficha técnica completa del producto a la API."""
+    url = f"{BASE_API_URL}/products/{product_id}"
+    response = session.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        # Fourthwall puede devolver el objeto directo o envuelto en 'data'
+        return data.get('data', data)
+    return None
+
+def get_exact_classification(detailed_product):
+    """Busca estrictamente en los metadatos profundos."""
     fields_to_check = []
     
-    # Extraemos todos los metadatos posibles donde la API pueda enviar el tipo de plantilla
-    if product.get('productType'): fields_to_check.append(str(product.get('productType')).lower())
-    if product.get('type'): fields_to_check.append(str(product.get('type')).lower())
-    if product.get('category'): fields_to_check.append(str(product.get('category')).lower())
+    # Revisamos todos los rincones del JSON detallado
+    if detailed_product.get('productType'): fields_to_check.append(str(detailed_product.get('productType')).lower())
+    if detailed_product.get('type'): fields_to_check.append(str(detailed_product.get('type')).lower())
+    if detailed_product.get('category'): fields_to_check.append(str(detailed_product.get('category')).lower())
     
-    tags = product.get('tags', [])
+    tags = detailed_product.get('tags', [])
     if isinstance(tags, list):
         for t in tags: fields_to_check.append(str(t).lower())
             
-    # Comprobamos estrictamente contra el diccionario
     for field in fields_to_check:
         for key, data in CATEGORIAS_FOURTHWALL.items():
             if key == field or key in field:
-                return data, field # Clasificación encontrada
+                return data, field
                 
-    # Si la API no envió la plantilla, devolvemos default
     return CATEGORIA_DEFAULT, None
 
 def build_xml_feed():
-    products = get_all_products()
-    if not products:
+    summary_products = get_all_products_summary()
+    if not summary_products:
         print("⚠️ No se encontraron productos.")
         return
 
     xml_items = []
+    print(f"🔍 Iniciando Deep Fetch para {len(summary_products)} productos...")
 
-    for product in products:
-        product_id = product.get('id')
-        title = product.get('name', 'Producto sin nombre')
-        slug = product.get('slug', '')
+    for summary in summary_products:
+        product_id = summary.get('id')
+        title = summary.get('name', 'Producto sin nombre')
+        slug = summary.get('slug', '')
         
-        classification, matched_term = get_exact_classification(product)
+        # <<< DEEP FETCH: Llamada individual por producto >>>
+        detailed_product = get_product_details(product_id)
         
-        # Sistema de alerta en consola
+        # Si la llamada falla, usamos el resumen básico como respaldo
+        if not detailed_product:
+            detailed_product = summary
+            
+        # Pausa para no saturar la API
+        time.sleep(0.1)
+
+        classification, matched_term = get_exact_classification(detailed_product)
+        
         if matched_term:
-            print(f"✔️ [{title}] -> Plantilla detectada: '{matched_term}' -> {classification['gpc']}")
+            print(f"✔️ [{title}] -> Plantilla: '{matched_term}' -> {classification['gpc']}")
         else:
-            print(f"⚠️ [{title}] -> La API no envió datos de plantilla/etiqueta. Asignado a Ropa por defecto.")
+            print(f"⚠️ [{title}] -> Ficha profunda revisada. API sigue sin enviar plantilla/etiqueta. Default: Ropa.")
 
-        raw_description = product.get('description', '')
+        raw_description = detailed_product.get('description', summary.get('description', ''))
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description: clean_description = title
         product_link = f"{STORE_URL}/products/{slug}"
 
-        raw_images = product.get('images', [])
+        raw_images = detailed_product.get('images', summary.get('images', []))
         all_image_urls = []
         for img in raw_images:
             img_url = img.get('url', img.get('transformedUrl', '')) if isinstance(img, dict) else img if isinstance(img, str) else ""
@@ -161,8 +169,8 @@ def build_xml_feed():
         for add_img in additional_images:
             image_tags_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
 
-        base_price_str = extract_price(product)
-        variants = product.get('variants', [])
+        base_price_str = extract_price(detailed_product)
+        variants = detailed_product.get('variants', summary.get('variants', []))
 
         if not variants:
             item_xml = f"""
