@@ -40,6 +40,7 @@ def safe_escape(val):
     return escape(str(val))
 
 def extract_availability(product_state, variant_stock):
+    """Calcula disponibilidad usando los esquemas de Fourthwall"""
     if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
         return 'out of stock'
     if isinstance(variant_stock, dict):
@@ -50,7 +51,7 @@ def extract_availability(product_state, variant_stock):
     return 'in stock'
 
 def extract_price(data_dict):
-    """Busca el precio en el formato correcto de la API ('unitPrice' o 'price')"""
+    """Busca el precio en el formato 'unitPrice' de la variante"""
     if not data_dict or not isinstance(data_dict, dict): return "0.00 USD"
     
     price_obj = data_dict.get('unitPrice') or data_dict.get('price')
@@ -61,59 +62,60 @@ def extract_price(data_dict):
     return "0.00 USD"
 
 def clasificar_producto(variant, title):
-    """Clasificador preciso que aísla el análisis solo al atributo Talla."""
-    attrs = variant.get('attributes', {})
-    
-    # 1. Buscamos de forma segura el atributo de Talla (Size)
-    size_name = ""
-    for k, v in attrs.items():
-        if k.lower() in ['size', 'talla', 'tamaño']:
-            size_name = str(v.get('name', v) if isinstance(v, dict) else v).lower().strip()
-            
-    # 2. Análisis Físico Estricto (Solo sobre la talla, ignorando el color)
-    if size_name:
-        if 'oz' in size_name or 'onza' in size_name: 
-            return CATEGORIAS["drinkware"], f"Talla ({size_name})"
-        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: 
-            return CATEGORIAS["apparel"], f"Talla ({size_name})"
-        # Medidas en cm/in/pulgadas son arte/posters
-        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): 
-            return CATEGORIAS["art"], f"Medida ({size_name})"
-
-    # 3. Respaldo por Título (Palabras clave estrictas, sin "digital" para evitar falsos positivos)
+    """Filtro Híbrido Avanzado: Prioridad absoluta a palabras clave del título"""
     t = title.lower()
-    if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza)"
+    
+    # 1. PRIORIDAD MÁXIMA: Palabras clave inequívocas en el título para evitar falsos positivos
     if any(w in t for w in ['sticker', 'pegatina']): return CATEGORIAS["sticker"], "Título (Sticker)"
+    if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza/Mug)"
     if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
-    if any(w in t for w in ['funda', 'case', 'sleeve']): return CATEGORIAS["accessories"], "Título (Accesorio)"
+    if any(w in t for w in ['funda', 'case', 'sleeve', 'fundas para portátil']): return CATEGORIAS["accessories"], "Título (Accesorio)"
     if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro', 'canvas']): return CATEGORIAS["art"], "Título (Arte)"
     if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa']): return CATEGORIAS["apparel"], "Título (Ropa)"
+
+    # 2. RESPALDO: Filtro por Atributos Físicos de la variante (Estructura estricta del esquema)
+    attrs = variant.get('attributes', {})
+    size_obj = attrs.get('size', {})
+    size_name = ""
+    if isinstance(size_obj, dict):
+        size_name = str(size_obj.get('name', '')).lower().strip()
+    else:
+        size_name = str(size_obj).lower().strip()
+            
+    if size_name:
+        if 'oz' in size_name or 'onza' in size_name: 
+            return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
+        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: 
+            return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
+        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): 
+            return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
 
     return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def get_all_products_summary():
+    """Descarga de productos empezando desde la página 0 obligatoria"""
     products = []
-    # ¡CORRECCIÓN CLAVE! La API de Fourthwall empieza en la página 0[cite: 2]
     page = 0 
-    has_more = True
+    total_pages = 1
     print("📦 Conectando a Open API y descargando catálogo completo...")
     
-    while has_more:
-        url = f"{BASE_API_URL}/products?page={page}&size=50" # Cambiado a 'size' según docs[cite: 2]
+    while page < total_pages:
+        url = f"{BASE_API_URL}/products?page={page}&size=50"
         print(f"-> Descargando página {page}...")
         
         response = session.get(url)
         if response.status_code == 200:
             data = response.json()
-            items = data.get('results', data.get('data', []))
+            items = data.get('results', [])
             
             if not items:
-                print("   [Fin del catálogo alcanzado]")
-                has_more = False
                 break
                 
             products.extend(items)
             print(f"   + {len(items)} productos base encontrados.")
+            
+            # Sincronizamos con el número total de páginas reales devuelto en la raíz
+            total_pages = data.get('totalPages', 1)
             page += 1
         else:
             print(f"❌ Error API listando productos en la página {page}: {response.status_code} - {response.text}")
@@ -135,10 +137,11 @@ def build_xml_feed():
         title = summary.get('name', 'Producto sin nombre')
         slug = summary.get('slug', '')
         
+        # Consultamos el endpoint detallado por ID para extraer las variantes completas
         url_detail = f"{BASE_API_URL}/products/{product_id}"
         resp_detail = session.get(url_detail)
-        detailed_product = resp_detail.json().get('data', summary) if resp_detail.status_code == 200 else summary
-            
+        detailed_product = resp_detail.json() if resp_detail.status_code == 200 else summary
+
         raw_description = detailed_product.get('description', '')
         clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
         if not clean_description: clean_description = title
@@ -146,18 +149,19 @@ def build_xml_feed():
         
         product_state = detailed_product.get('state', {})
 
+        # Mapeamos la galería de imágenes principal del producto
         raw_images = detailed_product.get('images', [])
         all_image_urls = []
         for img in raw_images:
-            img_url = img.get('url', img.get('transformedUrl', '')) if isinstance(img, dict) else img if isinstance(img, str) else ""
+            img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
             if img_url and img_url not in all_image_urls:
                 all_image_urls.append(img_url)
 
-        variants = detailed_product.get('variants', summary.get('variants', []))
+        variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
         if not variants:
-            # Producto sin variantes
+            # Fallback seguro por si un producto no tiene variantes declaradas
             classification, razon = clasificar_producto({}, title)
             main_image_link = all_image_urls[0] if all_image_urls else ""
             
@@ -185,7 +189,7 @@ def build_xml_feed():
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
         else:
-            # Procesando variantes
+            # Desglosamos fila por fila cada variante para Pinterest
             for variant in variants:
                 variant_id = variant.get('id', product_id)
                 v_name = variant.get('name', '')
@@ -200,19 +204,23 @@ def build_xml_feed():
                 availability = extract_availability(product_state, variant.get('stock'))
                 
                 attributes = variant.get('attributes', {})
-                # Búsqueda tolerante de color y talla sin importar mayúsculas/minúsculas
+                
+                # Extraemos de forma estricta según el esquema nested de la API
                 color_name = ""
+                color_obj = attributes.get('color')
+                if isinstance(color_obj, dict):
+                    color_name = color_obj.get('name', '')
+                
                 size_name = ""
-                for k, v in attributes.items():
-                    val_clean = str(v.get('name', v) if isinstance(v, dict) else v).strip()
-                    if k.lower() in ['color', 'colour']: color_name = val_clean
-                    if k.lower() in ['size', 'talla', 'tamaño']: size_name = val_clean
+                size_obj = attributes.get('size')
+                if isinstance(size_obj, dict):
+                    size_name = size_obj.get('name', '')
 
                 sku = variant.get('sku', '')
                 weight = variant.get('weight', {})
                 weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
 
-                # Imagen de variante o fallback
+                # Imagen asignada a la variante o fallback a la galería general
                 var_thumb = variant.get('thumbnailImage', {})
                 main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else (all_image_urls[0] if all_image_urls else "")
 
@@ -226,7 +234,7 @@ def build_xml_feed():
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
                 
                 for add_img in all_image_urls[1:11]:
-                    if add_img != main_image_link: # Evitar duplicar la principal
+                    if add_img != main_image_link: 
                         item_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
 
                 item_xml += f"""
