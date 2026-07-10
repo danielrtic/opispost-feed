@@ -34,6 +34,7 @@ jobs:
           # Inyecta el usuario y contraseña desde los Secrets de GitHub
           FOURTHWALL_API_USER: ${{ secrets.FOURTHWALL_API_USER }}
           FOURTHWALL_API_PASS: ${{ secrets.FOURTHWALL_API_PASS }}
+          FOURTHWALL_PLATFORM_TOKEN: ${{ secrets.FOURTHWALL_PLATFORM_TOKEN }}
         run: python feed.py
 
       - name: Hacer Commit y Push del nuevo XML
