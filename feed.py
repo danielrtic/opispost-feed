@@ -2,6 +2,7 @@ import requests
 import time
 import os
 import html
+import re
 from xml.sax.saxutils import escape
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -24,7 +25,6 @@ session.headers.update({
 })
 
 CATEGORIAS = {
-    # Pasamos de 2 niveles a 3 niveles ("Shirts & Tops")
     "apparel": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
     "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
     "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
@@ -33,20 +33,27 @@ CATEGORIAS = {
     "accessories": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False}
 }
 
-# Pasamos de 1 nivel a 3 niveles
 CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True}
 
 def safe_escape(val):
+    """Escapa de forma segura solo atributos básicos de XML (URLs, IDs, Precios)"""
     if not val: return ""
     if isinstance(val, dict): val = val.get('name', val.get('value', str(val)))
     elif isinstance(val, list): val = ", ".join(str(v) for v in val)
     return escape(str(val))
 
-def clean_title_text(text):
+def clean_text(text):
+    """Limpieza extrema: decodifica entidades HTML, borra etiquetas y quita 'Copy of'"""
     if not text: return ""
-    decoded_text = html.unescape(text)
-    cleaned = decoded_text.replace("Copy of ", "").replace("Copy of", "")
-    return cleaned.strip()
+    # 1. Decodificar entidades (doble pasada por si Fourthwall manda &amp;amp;)
+    text = html.unescape(str(text))
+    text = html.unescape(text)
+    # 2. Borrar cualquier etiqueta HTML (<p>, <ul>, <li>, <i>, etc.)
+    text = re.sub(r'<[^>]+>', ' ', text)
+    # 3. Eliminar "Copy of"
+    text = text.replace("Copy of ", "").replace("Copy of", "")
+    # 4. Limpiar espacios extra
+    return " ".join(text.split()).strip()
 
 def extract_availability(product_state, variant_stock):
     if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
@@ -61,7 +68,6 @@ def extract_availability(product_state, variant_stock):
 
 def extract_price(data_dict):
     if not data_dict or not isinstance(data_dict, dict): return "0.00 USD"
-    
     price_obj = data_dict.get('unitPrice') or data_dict.get('price')
     if isinstance(price_obj, dict):
         val = price_obj.get('value', price_obj.get('amount', '0.00'))
@@ -77,25 +83,27 @@ def clasificar_producto(variant, title):
     if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
     if any(w in t for w in ['funda', 'case', 'sleeve', 'fundas para portátil']): return CATEGORIAS["accessories"], "Título (Accesorio)"
     if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro', 'canvas']): return CATEGORIAS["art"], "Título (Arte)"
-    if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa']): return CATEGORIAS["apparel"], "Título (Ropa)"
+    if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa', 'top', 'vestido']): return CATEGORIAS["apparel"], "Título (Ropa)"
 
     attrs = variant.get('attributes', {})
     size_obj = attrs.get('size', {})
-    size_name = ""
-    if isinstance(size_obj, dict):
-        size_name = str(size_obj.get('name', '')).lower().strip()
-    else:
-        size_name = str(size_obj).lower().strip()
+    size_name = str(size_obj.get('name', '')).lower().strip() if isinstance(size_obj, dict) else str(size_obj).lower().strip()
             
     if size_name:
-        if 'oz' in size_name or 'onza' in size_name: 
-            return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
-        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: 
-            return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
-        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): 
-            return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
+        if 'oz' in size_name or 'onza' in size_name: return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
+        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
+        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
 
     return CATEGORIA_DEFAULT, "Valor por Defecto"
+
+def determinar_genero(title):
+    """Detecta si la prenda es de chica, chico o unisex basado en el título"""
+    t_lower = title.lower()
+    if any(w in t_lower for w in ['mujer', 'chica', 'women', 'ladies', 'crop top', 'vestido', 'falda']):
+        return "female"
+    elif any(w in t_lower for w in ['hombre', 'chico', 'men', 'mens']):
+        return "male"
+    return "unisex"
 
 def get_all_products_summary():
     products = []
@@ -111,17 +119,13 @@ def get_all_products_summary():
         if response.status_code == 200:
             data = response.json()
             items = data.get('results', [])
-            
-            if not items:
-                break
-                
+            if not items: break
             products.extend(items)
             print(f"   + {len(items)} productos base encontrados.")
-            
             total_pages = data.get('totalPages', 1)
             page += 1
         else:
-            print(f"❌ Error API listando productos en la página {page}: {response.status_code} - {response.text}")
+            print(f"❌ Error API listando productos: {response.status_code}")
             break
             
     return products
@@ -133,12 +137,12 @@ def build_xml_feed():
         return
 
     xml_items = []
-    print(f"\n🔍 Procesando {len(summary_products)} productos base...")
+    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML y Entidades)...")
 
     for summary in summary_products:
         product_id = summary.get('id')
         raw_title = summary.get('name', 'Producto sin nombre')
-        title = clean_title_text(raw_title)
+        title = clean_text(raw_title)
         slug = summary.get('slug', '')
         
         url_detail = f"{BASE_API_URL}/products/{product_id}"
@@ -151,7 +155,6 @@ def build_xml_feed():
         if access_type != 'PUBLIC':
             continue
 
-        # Galería base del producto (Como respaldo)
         raw_images = detailed_product.get('images', [])
         all_image_urls = []
         for img in raw_images:
@@ -161,11 +164,12 @@ def build_xml_feed():
         if not all_image_urls:
             continue
 
+        # Limpieza extrema de la descripción usando Regex y unescape
         raw_description = detailed_product.get('description', '')
-        clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
+        clean_description = clean_text(raw_description)
         if not clean_description: clean_description = title
-        product_link = f"{STORE_URL}/products/{slug}"
         
+        product_link = f"{STORE_URL}/products/{slug}"
         product_state = detailed_product.get('state', {})
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
@@ -173,13 +177,15 @@ def build_xml_feed():
         if not variants:
             classification, razon = clasificar_producto({}, title)
             main_image_link = all_image_urls[0] if all_image_urls else ""
+            gender = determinar_genero(title) if classification['is_apparel'] else None
             
+            # Usamos CDATA para título y descripción, protegiendo emojis y símbolos
             item_xml = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title>{safe_escape(title[:150])}</g:title>
-            <g:description>{safe_escape(clean_description[:500])}</g:description>
+            <g:title><![CDATA[{title[:150]}]]></g:title>
+            <g:description><![CDATA[{clean_description[:500]}]]></g:description>
             <g:link>{safe_escape(product_link)}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
             
@@ -191,10 +197,10 @@ def build_xml_feed():
             <g:availability>{extract_availability(product_state, {})}</g:availability>
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
-            <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
+            <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
             
-            if classification['is_apparel']:
-                item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
+            if gender:
+                item_xml += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml += "\n        </item>"
             xml_items.append(item_xml)
         else:
@@ -202,14 +208,14 @@ def build_xml_feed():
                 variant_id = variant.get('id', product_id)
                 raw_v_name = variant.get('name', '')
                 
-                v_name = clean_title_text(raw_v_name)
-                
+                v_name = clean_text(raw_v_name)
                 if title.lower() in v_name.lower():
                     full_title = v_name
                 else:
                     full_title = f"{title} - {v_name}" if v_name else title
                 
                 classification, razon = clasificar_producto(variant, title)
+                gender = determinar_genero(full_title) if classification['is_apparel'] else None
                 
                 variant_price_str = extract_price(variant)
                 if variant_price_str == "0.00 USD": variant_price_str = base_price_str
@@ -229,32 +235,26 @@ def build_xml_feed():
                 weight = variant.get('weight', {})
                 weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
 
-                # ==========================================
-                # CORRECCIÓN DE IMÁGENES POR VARIANTE
-                # ==========================================
                 raw_var_images = variant.get('images', [])
                 var_image_urls = []
                 for img in raw_var_images:
                     img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
-                    if img_url and img_url not in var_image_urls: 
-                        var_image_urls.append(img_url)
+                    if img_url and img_url not in var_image_urls: var_image_urls.append(img_url)
 
                 var_thumb = variant.get('thumbnailImage', {})
                 main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else ""
                 
-                # Si la variante no tiene thumbnail, usamos su primera imagen. Si no tiene ninguna, usamos la del producto base.
                 if not main_image_link:
                     main_image_link = var_image_urls[0] if var_image_urls else (all_image_urls[0] if all_image_urls else "")
                 
-                # Para las adicionales, usamos estrictamente las de la variante si tiene. Si no, las generales.
                 images_to_use = var_image_urls if var_image_urls else all_image_urls
 
                 item_xml = f"""
         <item>
             <g:id>{safe_escape(variant_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title>{safe_escape(full_title[:150])}</g:title>
-            <g:description>{safe_escape(clean_description[:500])}</g:description>
+            <g:title><![CDATA[{full_title[:150]}]]></g:title>
+            <g:description><![CDATA[{clean_description[:500]}]]></g:description>
             <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
                 
@@ -267,15 +267,15 @@ def build_xml_feed():
             <g:availability>{availability}</g:availability>
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
-            <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
+            <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
                 
-                if color_name: item_xml += f"\n            <g:color>{safe_escape(color_name)}</g:color>"
-                if size_name: item_xml += f"\n            <g:size>{safe_escape(size_name)}</g:size>"
+                if color_name: item_xml += f"\n            <g:color><![CDATA[{color_name}]]></g:color>"
+                if size_name: item_xml += f"\n            <g:size><![CDATA[{size_name}]]></g:size>"
                 if sku: item_xml += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
                 if weight_str: item_xml += f"\n            <g:shipping_weight>{safe_escape(weight_str)}</g:shipping_weight>"
                 
-                if classification['is_apparel']:
-                    item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
+                if gender:
+                    item_xml += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml += "\n        </item>"
                 xml_items.append(item_xml)
             print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
