@@ -16,91 +16,89 @@ BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 session = requests.Session()
 retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 429, 500, 502, 503, 504 ])
 session.mount('https://', HTTPAdapter(max_retries=retries))
-
-# Autenticación con Usuario y Contraseña (La que nunca falla aquí)
 session.auth = (API_USER, API_PASS)
 session.headers.update({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
 })
 
-# ==========================================
-# DICCIONARIO DE CATEGORÍAS GOOGLE
-# ==========================================
 CATEGORIAS = {
     "apparel": {"gpc": "Apparel & Accessories > Clothing", "is_apparel": True},
-    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware", "is_apparel": False},
-    "art": {"gpc": "Home & Garden > Decor > Artwork", "is_apparel": False},
-    "stationery": {"gpc": "Office Supplies", "is_apparel": False}
+    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
+    "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
+    "stationery": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
+    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False}
 }
-
 CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories", "is_apparel": True}
 
 def safe_escape(val):
     if not val: return ""
-    if isinstance(val, dict): val = val.get('name', val.get('value', str(val)))
-    elif isinstance(val, list): val = ", ".join(str(v) for v in val)
     return escape(str(val))
 
-def extract_price(price_info):
-    if isinstance(price_info, dict):
-        val = price_info.get('value', price_info.get('amount', '0.00'))
-        curr = price_info.get('currency', price_info.get('currencyCode', 'USD'))
-        return f"{val} {curr}"
-    return "0.00 USD"
+def extract_availability(product_state, variant_stock):
+    """Calcula disponibilidad usando los esquemas OfferStateV1 y StockV1 de Fourthwall"""
+    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
+        return 'out of stock'
+    
+    if isinstance(variant_stock, dict):
+        stock_type = variant_stock.get('type')
+        if stock_type == 'UNLIMITED':
+            return 'in stock'
+        if stock_type == 'LIMITED':
+            in_stock = variant_stock.get('inStock', 0)
+            return 'in stock' if in_stock > 0 else 'out of stock'
+            
+    return 'in stock'
+
+def clasificar_por_fisica(variant, title):
+    """Clasificación basada en OfferVariantAbstractV1 (Dimensiones, Peso, Atributos)"""
+    
+    # 1. Por Talla Textil / Onzas (Atributos)
+    attrs = variant.get('attributes', {})
+    size_obj = attrs.get('size', {})
+    size_name = str(size_obj.get('name', '')).lower() if isinstance(size_obj, dict) else str(size_obj).lower()
+    
+    if size_name:
+        if 'oz' in size_name or 'onza' in size_name: return CATEGORIAS["drinkware"], f"Tamaño ({size_name})"
+        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', 'small', 'medium', 'large']: 
+            return CATEGORIAS["apparel"], f"Talla Textil ({size_name})"
+        if 'x' in size_name and ('"' in size_name or 'cm' in size_name): 
+            return CATEGORIAS["art"], f"Medidas de Arte ({size_name})"
+
+    # 2. Por Dimensiones Exactas (Si existe en OfferVariantV1.dimensions)
+    dims = variant.get('dimensions', {})
+    if dims and isinstance(dims, dict):
+        # Si tiene dimensiones exactas de longitud/anchura sin ser ropa, suele ser pósters/cuadros/libretas
+        return CATEGORIAS["art"], "Por dimensiones físicas declaradas"
+
+    # 3. Respaldo Final por Título (Requerido ya que la API oculta la plantilla)
+    t = title.lower()
+    if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza/Mug)"
+    if any(w in t for w in ['sticker', 'pegatina']): return CATEGORIAS["sticker"], "Título (Sticker)"
+    if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
+    if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro']): return CATEGORIAS["art"], "Título (Arte)"
+    if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera']): return CATEGORIAS["apparel"], "Título (Ropa)"
+
+    return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def get_all_products_summary():
     products = []
     page = 1
     total_pages = 1
-    print("📦 Conectando a Open API con Usuario/Contraseña...")
+    print("📦 Conectando a Fourthwall Open API...")
     
     while page <= total_pages:
         url = f"{BASE_API_URL}/products?page={page}&limit=50"
         response = session.get(url)
-        
         if response.status_code == 200:
             data = response.json()
             items = data.get('results', data.get('data', []))
             products.extend(items)
-            pagination = data.get('pagination', {})
-            total_pages = data.get('totalPages', pagination.get('total_pages', 1))
+            total_pages = data.get('totalPages', data.get('pagination', {}).get('total_pages', 1))
             page += 1
         else:
-            print(f"❌ Error API: {response.status_code} - {response.text}")
             break
-            
     return products
-
-def get_product_details(product_id):
-    url = f"{BASE_API_URL}/products/{product_id}"
-    response = session.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data.get('data', data)
-    return None
-
-def clasificar_por_fisica(detailed_product):
-    """Clasifica empíricamente leyendo los atributos reales de las variantes."""
-    variants = detailed_product.get('variants', [])
-    for variant in variants:
-        attrs = variant.get('attributes', {})
-        for attr_key, attr_val in attrs.items():
-            val_str = str(attr_val).lower()
-            
-            # Si se mide en onzas, es una taza/vaso
-            if 'oz' in val_str: 
-                return CATEGORIAS["drinkware"], "Capacidad (oz)"
-                
-            # Si usa tallaje estándar, es ropa
-            if val_str in ['xs', 's', 'm', 'l', 'xl', '2xl', '3xl', '4xl']: 
-                return CATEGORIAS["apparel"], "Tallaje textil"
-                
-            # Si tiene medidas multiplicadas, es un póster/cuadro
-            if 'x' in val_str and ('"' in val_str or 'cm' in val_str or 'inch' in val_str): 
-                return CATEGORIAS["art"], "Medidas (cm/inch)"
-
-    return None, None
 
 def build_xml_feed():
     summary_products = get_all_products_summary()
@@ -109,96 +107,97 @@ def build_xml_feed():
         return
 
     xml_items = []
-    print(f"🔍 Procesando {len(summary_products)} productos...")
+    print(f"🔍 Procesando {len(summary_products)} productos (Deep Fetch para extraer MPN/Peso/Variantes)...")
 
     for summary in summary_products:
         product_id = summary.get('id')
         title = summary.get('name', 'Producto sin nombre')
         slug = summary.get('slug', '')
         
-        detailed_product = get_product_details(product_id)
-        if not detailed_product: 
-            detailed_product = summary
-            
-        # Intentamos clasificar por las propiedades físicas irrefutables
-        classification, razon = clasificar_por_fisica(detailed_product)
-        
-        if classification:
-            print(f"✔️ [{title[:30]}...] -> Identificado por {razon} -> {classification['gpc'].split('>')[-1].strip()}")
-        else:
-            classification = CATEGORIA_DEFAULT
-            print(f"⚠️ [{title[:30]}...] -> Sin atributos físicos claros. Asignado a Ropa por defecto.")
+        # Obtenemos el OfferFullV1
+        url_detail = f"{BASE_API_URL}/products/{product_id}"
+        resp_detail = session.get(url_detail)
+        product = resp_detail.json().get('data', summary) if resp_detail.status_code == 200 else summary
 
-        raw_description = detailed_product.get('description', '')
-        clean_description = raw_description.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
-        if not clean_description: clean_description = title
+        raw_desc = product.get('description', '')
+        clean_desc = raw_desc.replace('<p>', '').replace('</p>', '').replace('<br>', ' ').strip()
+        if not clean_desc: clean_desc = title
         product_link = f"{STORE_URL}/products/{slug}"
+        
+        product_state = product.get('state', {})
 
-        raw_images = detailed_product.get('images', [])
+        # Extraer todas las imágenes del producto
         all_image_urls = []
-        for img in raw_images:
-            img_url = img.get('url', img.get('transformedUrl', '')) if isinstance(img, dict) else img if isinstance(img, str) else ""
-            if img_url and img_url not in all_image_urls:
-                all_image_urls.append(img_url)
+        for img in product.get('images', []):
+            if isinstance(img, dict) and img.get('url'):
+                all_image_urls.append(img.get('url'))
 
-        main_image_link = all_image_urls[0] if all_image_urls else ""
-        additional_images = all_image_urls[1:11] 
-
-        image_tags_xml = f"\n            <g:image_link>{safe_escape(main_image_link)}</g:image_link>"
-        for add_img in additional_images:
-            image_tags_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
-
-        base_price_str = extract_price(detailed_product.get('price', summary.get('price')))
-        variants = detailed_product.get('variants', summary.get('variants', []))
-
-        if not variants:
-            item_xml = f"""
-        <item>
-            <g:id>{safe_escape(product_id)}</g:id>
-            <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title>{safe_escape(title[:150])}</g:title>
-            <g:description>{safe_escape(clean_description[:500])}</g:description>
-            <g:link>{safe_escape(product_link)}</g:link>{image_tags_xml}
-            <g:price>{safe_escape(base_price_str)}</g:price>
-            <g:availability>in stock</g:availability>
-            <g:condition>new</g:condition>
-            <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
+        variants = product.get('variants', [])
+        
+        for variant in variants:
+            variant_id = variant.get('id', product_id)
+            v_name = variant.get('name', '')
+            full_title = f"{title} - {v_name}" if v_name else title
             
-            if classification['is_apparel']:
-                item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
-            item_xml += "\n        </item>"
-            xml_items.append(item_xml)
-        else:
-            for variant in variants:
-                variant_id = variant.get('id', product_id)
-                v_name = variant.get('name', '')
-                full_title = f"{title} - {v_name}" if v_name else title
+            # Clasificación Inteligente
+            classification, razon = clasificar_por_fisica(variant, title)
+            
+            # Precio (OfferVariantV1.unitPrice)
+            price_obj = variant.get('unitPrice', {})
+            price_str = f"{price_obj.get('value', '0.00')} {price_obj.get('currency', 'USD')}"
+            
+            # Disponibilidad
+            availability = extract_availability(product_state, variant.get('stock'))
+            
+            # Atributos oficiales
+            attrs = variant.get('attributes', {})
+            color_obj = attrs.get('color', {})
+            color_name = color_obj.get('name', '') if isinstance(color_obj, dict) else str(color_obj)
+            
+            size_obj = attrs.get('size', {})
+            size_name = size_obj.get('name', '') if isinstance(size_obj, dict) else str(size_obj)
+            
+            # SKUs y Peso (OfferVariantV1.sku / OfferVariantV1.weight)
+            sku = variant.get('sku', '')
+            weight_obj = variant.get('weight', {})
+            shipping_weight = ""
+            if isinstance(weight_obj, dict) and weight_obj.get('value'):
+                shipping_weight = f"{weight_obj.get('value')} {weight_obj.get('unit', 'kg')}"
                 
-                variant_price_str = extract_price(variant.get('price'))
-                if variant_price_str == "0.00 USD": variant_price_str = base_price_str
-                
-                attributes = variant.get('attributes', {})
-                color = attributes.get('color', attributes.get('Color', ''))
-                size = attributes.get('size', attributes.get('Size', ''))
-
-                item_xml = f"""
+            # Imágenes (Imagen principal de la variante o fallback al producto)
+            var_thumb = variant.get('thumbnailImage', {})
+            main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else (all_image_urls[0] if all_image_urls else "")
+            
+            # Construcción del nodo
+            item_xml = f"""
         <item>
             <g:id>{safe_escape(variant_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
             <g:title>{safe_escape(full_title[:150])}</g:title>
-            <g:description>{safe_escape(clean_description[:500])}</g:description>
-            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>{image_tags_xml}
-            <g:price>{safe_escape(variant_price_str)}</g:price>
-            <g:availability>in stock</g:availability>
+            <g:description>{safe_escape(clean_desc[:500])}</g:description>
+            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
+            <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
+            
+            for add_img in all_image_urls[1:11]:
+                item_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+
+            item_xml += f"""
+            <g:price>{safe_escape(price_str)}</g:price>
+            <g:availability>{availability}</g:availability>
             <g:condition>new</g:condition>
+            <g:brand>Opispot</g:brand>
             <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
+            
+            if color_name: item_xml += f"\n            <g:color>{safe_escape(color_name)}</g:color>"
+            if size_name: item_xml += f"\n            <g:size>{safe_escape(size_name)}</g:size>"
+            if sku: item_xml += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
+            if shipping_weight: item_xml += f"\n            <g:shipping_weight>{safe_escape(shipping_weight)}</g:shipping_weight>"
+            
+            if classification['is_apparel']:
+                item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
                 
-                if color: item_xml += f"\n            <g:color>{safe_escape(color)}</g:color>"
-                if size: item_xml += f"\n            <g:size>{safe_escape(size)}</g:size>"
-                if classification['is_apparel']:
-                    item_xml += f"\n            <g:gender>unisex</g:gender>\n            <g:age_group>adult</g:age_group>"
-                item_xml += "\n        </item>"
-                xml_items.append(item_xml)
+            item_xml += "\n        </item>"
+            xml_items.append(item_xml)
             
         time.sleep(0.05) # Pausa amigable
 
@@ -218,6 +217,6 @@ def build_xml_feed():
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
-        print("❌ Error: Faltan las credenciales FOURTHWALL_API_USER y/o FOURTHWALL_API_PASS.")
+        print("❌ Error: Faltan las credenciales.")
     else:
         build_xml_feed()
