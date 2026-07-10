@@ -10,7 +10,9 @@ from urllib3.util.retry import Retry
 # ==========================================
 API_USER = os.environ.get('FOURTHWALL_API_USER')
 API_PASS = os.environ.get('FOURTHWALL_API_PASS')
-STORE_URL = 'https://opispot.com' # Recuerda poner tu URL real
+
+# ¡DOMINIO ACTUALIZADO!
+STORE_URL = 'https://opispot.com' 
 BASE_API_URL = 'https://api.fourthwall.com/open-api/v1.0'
 
 session = requests.Session()
@@ -24,20 +26,32 @@ session.headers.update({
 })
 
 def safe_escape(val):
-    """
-    Función escudo: Convierte diccionarios y listas a texto 
-    antes de aplicar el escape XML para evitar cuelgues.
-    """
+    """Convierte diccionarios y listas a texto antes de aplicar el escape XML."""
     if not val:
         return ""
     if isinstance(val, dict):
-        # Si es un diccionario, intentamos sacar su nombre o valor
         val = val.get('name', val.get('value', str(val)))
     elif isinstance(val, list):
-        # Si es una lista, la unimos con comas
         val = ", ".join(str(v) for v in val)
-    
     return escape(str(val))
+
+def extract_price(data_dict):
+    """
+    Busca el precio exhaustivamente. La API puede devolverlo en 'price', 
+    'unitPrice', 'retailPrice' o anidado.
+    """
+    price_obj = data_dict.get('price') or data_dict.get('unitPrice') or data_dict.get('retailPrice')
+    
+    if isinstance(price_obj, dict):
+        # Extraemos el valor numérico y la moneda (ej. 'USD', 'EUR')
+        val = price_obj.get('value', price_obj.get('amount', '0.00'))
+        curr = price_obj.get('currency', price_obj.get('currencyCode', 'USD'))
+        return f"{val} {curr}"
+    elif isinstance(price_obj, (int, float, str)) and price_obj:
+        # Por si la API devuelve el número directamente
+        return f"{price_obj} USD"
+        
+    return "0.00 USD" # Valor de seguridad por defecto
 
 def get_all_products():
     products = []
@@ -53,10 +67,8 @@ def get_all_products():
         
         if response.status_code == 200:
             data = response.json()
-            
             items = data.get('results', [])
             products.extend(items)
-            
             print(f"   Se encontraron {len(items)} productos en esta página.")
             
             total_pages = data.get('totalPages', 1)
@@ -106,31 +118,41 @@ def build_xml_feed():
         product_link = f"{STORE_URL}/products/{slug}"
         classification = categorize_product(title)
 
+        # === EXTRACCIÓN DE TODAS LAS IMÁGENES ===
+        raw_images = product.get('images', [])
+        all_image_urls = []
+        for img in raw_images:
+            img_url = ""
+            if isinstance(img, dict):
+                img_url = img.get('url', img.get('transformedUrl', ''))
+            elif isinstance(img, str):
+                img_url = img
+                
+            if img_url and img_url not in all_image_urls:
+                all_image_urls.append(img_url)
+
+        main_image_link = all_image_urls[0] if all_image_urls else ""
+        # Pinterest admite hasta 10 imágenes adicionales
+        additional_images = all_image_urls[1:11] 
+
+        # Generador de etiquetas de imágenes para el XML
+        image_tags_xml = f"\n            <g:image_link>{safe_escape(main_image_link)}</g:image_link>"
+        for add_img in additional_images:
+            image_tags_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+
+        # === EXTRACCIÓN DE PRECIO BASE (Por si no hay variantes) ===
+        base_price_str = extract_price(product)
         variants = product.get('variants', [])
-        
-        images = product.get('images', [])
-        main_image_link = ''
-        if images:
-            first_img = images[0]
-            if isinstance(first_img, dict):
-                main_image_link = first_img.get('url', first_img.get('transformedUrl', ''))
-            elif isinstance(first_img, str):
-                main_image_link = first_img
 
         if not variants:
-            price_amount = product.get('price', {}).get('value', '0.00')
-            price_currency = product.get('price', {}).get('currency', 'USD')
-            price_str = f"{price_amount} {price_currency}"
-
             item_xml = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
             <g:title>{safe_escape(title[:150])}</g:title>
             <g:description>{safe_escape(clean_description[:500])}</g:description>
-            <g:link>{safe_escape(product_link)}</g:link>
-            <g:image_link>{safe_escape(main_image_link)}</g:image_link>
-            <g:price>{safe_escape(price_str)}</g:price>
+            <g:link>{safe_escape(product_link)}</g:link>{image_tags_xml}
+            <g:price>{safe_escape(base_price_str)}</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
             <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
@@ -146,8 +168,10 @@ def build_xml_feed():
                 v_name = variant.get('name', '')
                 full_title = f"{title} - {v_name}" if v_name else title
                 
-                v_price = variant.get('price', {})
-                price_str = f"{v_price.get('value', '0.00')} {v_price.get('currency', 'USD')}"
+                # Extraemos el precio de la variante. Si falla, usamos el base del producto.
+                variant_price_str = extract_price(variant)
+                if variant_price_str == "0.00 USD":
+                    variant_price_str = base_price_str
                 
                 attributes = variant.get('attributes', {})
                 color = attributes.get('color', '') if classification['is_apparel'] else ''
@@ -159,9 +183,8 @@ def build_xml_feed():
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
             <g:title>{safe_escape(full_title[:150])}</g:title>
             <g:description>{safe_escape(clean_description[:500])}</g:description>
-            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
-            <g:image_link>{safe_escape(main_image_link)}</g:image_link>
-            <g:price>{safe_escape(price_str)}</g:price>
+            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>{image_tags_xml}
+            <g:price>{safe_escape(variant_price_str)}</g:price>
             <g:availability>in stock</g:availability>
             <g:condition>new</g:condition>
             <g:google_product_category>{safe_escape(classification['gpc'])}</g:google_product_category>"""
@@ -176,7 +199,7 @@ def build_xml_feed():
     final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
     <channel>
-        <title>Mi Tienda Fourthwall</title>
+        <title>Opispot</title>
         <link>{STORE_URL}</link>
         <description>Catálogo oficial de productos para Pinterest</description>
         {''.join(xml_items)}
