@@ -45,14 +45,16 @@ def safe_escape(val):
 def clean_text(text):
     """Limpieza extrema: decodifica entidades HTML, borra etiquetas y quita 'Copy of'"""
     if not text: return ""
-    # 1. Decodificar entidades (doble pasada por si Fourthwall manda &amp;amp;)
+    # 1. Decodificar entidades (doble pasada por seguridad)
     text = html.unescape(str(text))
     text = html.unescape(text)
-    # 2. Borrar cualquier etiqueta HTML (<p>, <ul>, <li>, <i>, etc.)
+    # 2. Reemplazar espacios duros o nulos de HTML
+    text = text.replace('\xa0', ' ')
+    # 3. Borrar cualquier etiqueta HTML (<p>, <ul>, <li>, <i>, etc.)
     text = re.sub(r'<[^>]+>', ' ', text)
-    # 3. Eliminar "Copy of"
+    # 4. Eliminar "Copy of"
     text = text.replace("Copy of ", "").replace("Copy of", "")
-    # 4. Limpiar espacios extra
+    # 5. Limpiar espacios extra
     return " ".join(text.split()).strip()
 
 def extract_availability(product_state, variant_stock):
@@ -164,7 +166,6 @@ def build_xml_feed():
         if not all_image_urls:
             continue
 
-        # Limpieza extrema de la descripción usando Regex y unescape
         raw_description = detailed_product.get('description', '')
         clean_description = clean_text(raw_description)
         if not clean_description: clean_description = title
@@ -179,7 +180,6 @@ def build_xml_feed():
             main_image_link = all_image_urls[0] if all_image_urls else ""
             gender = determinar_genero(title) if classification['is_apparel'] else None
             
-            # Usamos CDATA para título y descripción, protegiendo emojis y símbolos
             item_xml = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
@@ -209,10 +209,10 @@ def build_xml_feed():
                 raw_v_name = variant.get('name', '')
                 
                 v_name = clean_text(raw_v_name)
-                if title.lower() in v_name.lower():
-                    full_title = v_name
-                else:
-                    full_title = f"{title} - {v_name}" if v_name else title
+                
+                # Sistema a prueba de balas para no duplicar el título
+                v_name_clean = re.sub(re.escape(title), '', v_name, flags=re.IGNORECASE).strip(' -')
+                full_title = f"{title} - {v_name_clean}" if v_name_clean else title
                 
                 classification, razon = clasificar_producto(variant, title)
                 gender = determinar_genero(full_title) if classification['is_apparel'] else None
@@ -292,7 +292,8 @@ def build_xml_feed():
     </channel>
 </rss>"""
 
-    with open('pinterest_feed.xml', 'w', encoding='utf-8') as f:
+    # >>> LA MAGIA: Guardar como utf-8-sig añade la firma BOM que Microsoft necesita <<<
+    with open('pinterest_feed.xml', 'w', encoding='utf-8-sig') as f:
         f.write(final_xml)
     print(f"✅ Feed XML generado exitosamente con {len(xml_items)} variantes totales.")
 
