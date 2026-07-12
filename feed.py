@@ -36,25 +36,18 @@ CATEGORIAS = {
 CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True}
 
 def safe_escape(val):
-    """Escapa de forma segura solo atributos básicos de XML (URLs, IDs, Precios)"""
     if not val: return ""
     if isinstance(val, dict): val = val.get('name', val.get('value', str(val)))
     elif isinstance(val, list): val = ", ".join(str(v) for v in val)
     return escape(str(val))
 
 def clean_text(text):
-    """Limpieza extrema: decodifica entidades HTML, borra etiquetas y quita 'Copy of'"""
     if not text: return ""
-    # 1. Decodificar entidades (doble pasada por seguridad)
     text = html.unescape(str(text))
     text = html.unescape(text)
-    # 2. Reemplazar espacios duros o nulos de HTML
     text = text.replace('\xa0', ' ')
-    # 3. Borrar cualquier etiqueta HTML (<p>, <ul>, <li>, <i>, etc.)
     text = re.sub(r'<[^>]+>', ' ', text)
-    # 4. Eliminar "Copy of"
     text = text.replace("Copy of ", "").replace("Copy of", "")
-    # 5. Limpiar espacios extra
     return " ".join(text.split()).strip()
 
 def extract_availability(product_state, variant_stock):
@@ -99,7 +92,6 @@ def clasificar_producto(variant, title):
     return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def determinar_genero(title):
-    """Detecta si la prenda es de chica, chico o unisex basado en el título"""
     t_lower = title.lower()
     if any(w in t_lower for w in ['mujer', 'chica', 'women', 'ladies', 'crop top', 'vestido', 'falda']):
         return "female"
@@ -138,7 +130,11 @@ def build_xml_feed():
         print("⚠️ No se encontraron productos.")
         return
 
-    xml_items = []
+    # Listas separadas para Pinterest, Google y Bing
+    pinterest_items = []
+    google_items = []
+    bing_items = []
+    
     print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML y Entidades)...")
 
     for summary in summary_products:
@@ -180,37 +176,42 @@ def build_xml_feed():
             main_image_link = all_image_urls[0] if all_image_urls else ""
             gender = determinar_genero(title) if classification['is_apparel'] else None
             
-            item_xml = f"""
+            # Plantilla base sin la descripción
+            item_xml_base = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
             <g:title><![CDATA[{title[:150]}]]></g:title>
-            <g:description><![CDATA[{clean_description[:500]}]]></g:description>
+            <!-- DESC_PLACEHOLDER -->
             <g:link>{safe_escape(product_link)}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
             
             for add_img in all_image_urls[1:11]:
-                item_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+                item_xml_base += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
 
-            item_xml += f"""
+            item_xml_base += f"""
             <g:price>{safe_escape(base_price_str)}</g:price>
             <g:availability>{extract_availability(product_state, {})}</g:availability>
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
+            <g:identifier_exists>no</g:identifier_exists>
             <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
             
             if gender:
-                item_xml += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
-            item_xml += "\n        </item>"
-            xml_items.append(item_xml)
+                item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
+            item_xml_base += "\n        </item>"
+            
+            # Inyectamos descripciones con sus respectivos límites
+            pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
+            google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
+            bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
+            
         else:
             for variant in variants:
                 variant_id = variant.get('id', product_id)
                 raw_v_name = variant.get('name', '')
                 
                 v_name = clean_text(raw_v_name)
-                
-                # Sistema a prueba de balas para no duplicar el título
                 v_name_clean = re.sub(re.escape(title), '', v_name, flags=re.IGNORECASE).strip(' -')
                 full_title = f"{title} - {v_name_clean}" if v_name_clean else title
                 
@@ -249,53 +250,67 @@ def build_xml_feed():
                 
                 images_to_use = var_image_urls if var_image_urls else all_image_urls
 
-                item_xml = f"""
+                item_xml_base = f"""
         <item>
             <g:id>{safe_escape(variant_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
             <g:title><![CDATA[{full_title[:150]}]]></g:title>
-            <g:description><![CDATA[{clean_description[:500]}]]></g:description>
+            <!-- DESC_PLACEHOLDER -->
             <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
                 
                 for add_img in images_to_use[:11]:
                     if add_img != main_image_link: 
-                        item_xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+                        item_xml_base += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
 
-                item_xml += f"""
+                item_xml_base += f"""
             <g:price>{safe_escape(variant_price_str)}</g:price>
             <g:availability>{availability}</g:availability>
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
+            <g:identifier_exists>no</g:identifier_exists>
             <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
                 
-                if color_name: item_xml += f"\n            <g:color><![CDATA[{color_name}]]></g:color>"
-                if size_name: item_xml += f"\n            <g:size><![CDATA[{size_name}]]></g:size>"
-                if sku: item_xml += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
-                if weight_str: item_xml += f"\n            <g:shipping_weight>{safe_escape(weight_str)}</g:shipping_weight>"
+                if color_name: item_xml_base += f"\n            <g:color><![CDATA[{color_name}]]></g:color>"
+                if size_name: item_xml_base += f"\n            <g:size><![CDATA[{size_name}]]></g:size>"
+                if sku: item_xml_base += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
+                if weight_str: item_xml_base += f"\n            <g:shipping_weight>{safe_escape(weight_str)}</g:shipping_weight>"
                 
                 if gender:
-                    item_xml += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
-                item_xml += "\n        </item>"
-                xml_items.append(item_xml)
+                    item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
+                item_xml_base += "\n        </item>"
+                
+                # Inyectamos descripciones con sus respectivos límites
+                pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
+                google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
+                bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
+                
             print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
             
         time.sleep(0.05)
 
-    final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    def write_feed(filename, items_list):
+        final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
     <channel>
         <title>Opispot</title>
         <link>{STORE_URL}</link>
-        <description>Catálogo oficial de productos para Pinterest</description>
-        {''.join(xml_items)}
+        <description>Catálogo oficial de productos</description>
+        {''.join(items_list)}
     </channel>
 </rss>"""
+        with open(filename, 'w', encoding='utf-8-sig') as f:
+            f.write(final_xml)
 
-    # >>> LA MAGIA: Guardar como utf-8-sig añade la firma BOM que Microsoft necesita <<<
-    with open('pinterest_feed.xml', 'w', encoding='utf-8-sig') as f:
-        f.write(final_xml)
-    print(f"✅ Feed XML generado exitosamente con {len(xml_items)} variantes totales.")
+    # Escribimos los tres archivos
+    write_feed('pinterest_feed.xml', pinterest_items)
+    write_feed('google_feed.xml', google_items)
+    write_feed('bing_feed.xml', bing_items)
+    
+    print(f"✅ Feeds generados exitosamente:")
+    print(f"   -> pinterest_feed.xml ({len(pinterest_items)} variantes, límite 500 chars)")
+    print(f"   -> google_feed.xml ({len(google_items)} variantes, límite 5000 chars)")
+    print(f"   -> bing_feed.xml ({len(bing_items)} variantes, límite 10000 chars)")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
