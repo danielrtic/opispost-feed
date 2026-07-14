@@ -3,6 +3,7 @@ import time
 import os
 import html
 import re
+import unicodedata
 from xml.sax.saxutils import escape
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -49,14 +50,17 @@ def clean_text(text):
     text = text.replace('\xa0', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
     
-    # >>> NUEVO: Filtro definitivo para eliminar Emojis y Emoticonos complejos <<<
-    # Rango \u2600-\u27BF cubre Símbolos Misceláneos, Signos de Puntuación Adicionales y Dingbats
+    # Filtro definitivo para eliminar Emojis y Emoticonos complejos
     text = re.sub(r'[\u2600-\u27BF]', '', text)
-    # Rango \U00010000-\U0010FFFF cubre todos los bloques modernos de Emojis de la SMP de Unicode
     text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
     
     text = text.replace("Copy of ", "").replace("Copy of", "")
     return " ".join(text.split()).strip()
+
+def remove_accents(text):
+    """Elimina acentos y diacríticos (ej. á -> a, ñ -> n) para el feed de Bing"""
+    if not text: return ""
+    return "".join(c for c in unicodedata.normalize('NFD', str(text)) if unicodedata.category(c) != 'Mn')
 
 def extract_availability(product_state, variant_stock):
     if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
@@ -142,7 +146,7 @@ def build_xml_feed():
     google_items = []
     bing_items = []
     
-    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML, Entidades y Emojis)...")
+    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML, Entidades y Emojis. Bing sin acentos)...")
 
     for summary in summary_products:
         product_id = summary.get('id')
@@ -207,9 +211,14 @@ def build_xml_feed():
                 item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml_base += "\n        </item>"
             
+            # Pinterest y Google mantienen acentos
             pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
             google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
-            bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
+            
+            # Bing procesado sin acentos
+            bing_base = remove_accents(item_xml_base)
+            bing_desc = remove_accents(clean_description[:10000])
+            bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
             
         else:
             for variant in variants:
@@ -285,9 +294,14 @@ def build_xml_feed():
                     item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml_base += "\n        </item>"
                 
+                # Pinterest y Google mantienen acentos
                 pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
                 google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
-                bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
+                
+                # Bing procesado sin acentos
+                bing_base = remove_accents(item_xml_base)
+                bing_desc = remove_accents(clean_description[:10000])
+                bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
                 
             print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
             
@@ -310,7 +324,7 @@ def build_xml_feed():
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
     
-    print(f"✅ Feeds generados exitosamente sin emojis.")
+    print(f"✅ Feeds generados exitosamente. Bing no tiene acentos.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
