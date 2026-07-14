@@ -42,11 +42,19 @@ def safe_escape(val):
     return escape(str(val))
 
 def clean_text(text):
+    """Limpieza extrema: decodifica entidades HTML, borra etiquetas, quita 'Copy of' y elimina emojis"""
     if not text: return ""
     text = html.unescape(str(text))
     text = html.unescape(text)
     text = text.replace('\xa0', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
+    
+    # >>> NUEVO: Filtro definitivo para eliminar Emojis y Emoticonos complejos <<<
+    # Rango \u2600-\u27BF cubre Símbolos Misceláneos, Signos de Puntuación Adicionales y Dingbats
+    text = re.sub(r'[\u2600-\u27BF]', '', text)
+    # Rango \U00010000-\U0010FFFF cubre todos los bloques modernos de Emojis de la SMP de Unicode
+    text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
+    
     text = text.replace("Copy of ", "").replace("Copy of", "")
     return " ".join(text.split()).strip()
 
@@ -130,12 +138,11 @@ def build_xml_feed():
         print("⚠️ No se encontraron productos.")
         return
 
-    # Listas separadas para Pinterest, Google y Bing
     pinterest_items = []
     google_items = []
     bing_items = []
     
-    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML y Entidades)...")
+    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML, Entidades y Emojis)...")
 
     for summary in summary_products:
         product_id = summary.get('id')
@@ -176,7 +183,6 @@ def build_xml_feed():
             main_image_link = all_image_urls[0] if all_image_urls else ""
             gender = determinar_genero(title) if classification['is_apparel'] else None
             
-            # Plantilla base sin la descripción
             item_xml_base = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
@@ -201,7 +207,6 @@ def build_xml_feed():
                 item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml_base += "\n        </item>"
             
-            # Inyectamos descripciones con sus respectivos límites
             pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
             google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
             bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
@@ -280,7 +285,6 @@ def build_xml_feed():
                     item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml_base += "\n        </item>"
                 
-                # Inyectamos descripciones con sus respectivos límites
                 pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
                 google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
                 bing_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:10000]}]]></g:description>"))
@@ -302,15 +306,11 @@ def build_xml_feed():
         with open(filename, 'w', encoding='utf-8-sig') as f:
             f.write(final_xml)
 
-    # Escribimos los tres archivos
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
     
-    print(f"✅ Feeds generados exitosamente:")
-    print(f"   -> pinterest_feed.xml ({len(pinterest_items)} variantes, límite 500 chars)")
-    print(f"   -> google_feed.xml ({len(google_items)} variantes, límite 5000 chars)")
-    print(f"   -> bing_feed.xml ({len(bing_items)} variantes, límite 10000 chars)")
+    print(f"✅ Feeds generados exitosamente sin emojis.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
