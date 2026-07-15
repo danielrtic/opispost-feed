@@ -25,16 +25,64 @@ session.headers.update({
     'Accept': 'application/json'
 })
 
-CATEGORIAS = {
-    "apparel": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True},
-    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False},
-    "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False},
-    "stationery": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False},
-    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False},
-    "accessories": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False}
+# ==========================================
+# TRADUCCIÓN DE COLORES PARA SEO EN ESPAÑOL
+# ==========================================
+COLORES_ESPANOL = {
+    "black": "Negro",
+    "dark chocolate": "Marrón Chocolate",
+    "navy": "Azul Marino",
+    "true navy": "Azul Marino",
+    "purple": "Morado",
+    "maroon": "Granate",
+    "forest green": "Verde Bosque",
+    "heather navy": "Azul Marino Jaspeado",
+    "dark heather grey": "Gris Oscuro",
+    "dark heather": "Gris Oscuro",
+    "graphite heather": "Gris Grafito",
+    "royal": "Azul Real",
+    "military green": "Verde Militar",
+    "charcoal": "Gris Carbón",
+    "sapphire": "Azul Zafiro",
+    "heather indigo": "Índigo Jaspeado",
+    "heather red": "Rojo Jaspeado",
+    "red": "Rojo",
+    "brick": "Rojo Ladrillo",
+    "berry": "Frambuesa",
+    "flo blue": "Azul Eléctrico",
+    "watermelon": "Rosa Sandía",
+    "grey": "Gris",
+    "violet": "Violeta",
+    "butter": "Amarillo Pastel",
+    "heather royal": "Azul Real Jaspeado",
+    "kelly green": "Verde Esmeralda",
+    "heliconia": "Rosa Fucsia",
+    "orange": "Naranja",
+    "tropical blue": "Azul Tropical",
+    "irish green": "Verde Vivo",
+    "jade dome": "Verde Jade",
+    "heather irish green": "Verde Vivo Jaspeado",
+    "coral silk": "Color Coral",
+    "sand": "Color Arena",
+    "sport grey": "Gris Jaspeado",
+    "light blue": "Azul Claro",
+    "daisy": "Amarillo",
+    "ice grey": "Gris Claro",
+    "white": "Blanco",
+    "cornsilk": "Beige",
+    "natural": "Crudo / Natural"
 }
 
-CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True}
+CATEGORIAS = {
+    "apparel": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True, "is_art": False},
+    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False, "is_art": False},
+    "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False, "is_art": True},
+    "stationery": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False, "is_art": False},
+    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False, "is_art": False},
+    "accessories": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False, "is_art": False}
+}
+
+CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True, "is_art": False}
 
 def safe_escape(val):
     if not val: return ""
@@ -43,14 +91,12 @@ def safe_escape(val):
     return escape(str(val))
 
 def clean_text(text):
-    """Limpieza extrema: decodifica entidades HTML, borra etiquetas, quita 'Copy of' y elimina emojis"""
     if not text: return ""
     text = html.unescape(str(text))
     text = html.unescape(text)
     text = text.replace('\xa0', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
     
-    # Filtro definitivo para eliminar Emojis y Emoticonos complejos
     text = re.sub(r'[\u2600-\u27BF]', '', text)
     text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
     
@@ -58,7 +104,6 @@ def clean_text(text):
     return " ".join(text.split()).strip()
 
 def remove_accents(text):
-    """Elimina acentos y diacríticos (ej. á -> a, ñ -> n) para el feed de Bing"""
     if not text: return ""
     return "".join(c for c in unicodedata.normalize('NFD', str(text)) if unicodedata.category(c) != 'Mn')
 
@@ -84,7 +129,6 @@ def extract_price(data_dict):
 
 def clasificar_producto(variant, title):
     t = title.lower()
-    
     if any(w in t for w in ['sticker', 'pegatina']): return CATEGORIAS["sticker"], "Título (Sticker)"
     if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza/Mug)"
     if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
@@ -146,7 +190,7 @@ def build_xml_feed():
     google_items = []
     bing_items = []
     
-    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML, Entidades y Emojis. Bing sin acentos)...")
+    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML y aplicando SEO Español)...")
 
     for summary in summary_products:
         product_id = summary.get('id')
@@ -182,16 +226,30 @@ def build_xml_feed():
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
+        # ==========================================
+        # PRODUCTOS SIN VARIANTES
+        # ==========================================
         if not variants:
             classification, razon = clasificar_producto({}, title)
             main_image_link = all_image_urls[0] if all_image_urls else ""
             gender = determinar_genero(title) if classification['is_apparel'] else None
             
+            # --- INYECCIÓN SEO BASE ---
+            prefijo_seo = ""
+            if classification['is_apparel']:
+                genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
+                prefijo_seo = f"Ropa Urbana {genero_txt} - "
+            elif classification['is_art']:
+                prefijo_seo = "Póster Decorativo - "
+                
+            seo_title = f"{prefijo_seo}{title}"
+            # --------------------------
+            
             item_xml_base = f"""
         <item>
             <g:id>{safe_escape(product_id)}</g:id>
             <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title><![CDATA[{title[:150]}]]></g:title>
+            <g:title><![CDATA[{seo_title[:150]}]]></g:title>
             <!-- DESC_PLACEHOLDER -->
             <g:link>{safe_escape(product_link)}</g:link>
             <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
@@ -211,32 +269,22 @@ def build_xml_feed():
                 item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
             item_xml_base += "\n        </item>"
             
-            # Pinterest y Google mantienen acentos
             pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
             google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
             
-            # Bing procesado sin acentos
             bing_base = remove_accents(item_xml_base)
             bing_desc = remove_accents(clean_description[:10000])
             bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
             
+        # ==========================================
+        # PRODUCTOS CON VARIANTES
+        # ==========================================
         else:
             for variant in variants:
                 variant_id = variant.get('id', product_id)
                 raw_v_name = variant.get('name', '')
                 
-                v_name = clean_text(raw_v_name)
-                v_name_clean = re.sub(re.escape(title), '', v_name, flags=re.IGNORECASE).strip(' -')
-                full_title = f"{title} - {v_name_clean}" if v_name_clean else title
-                
-                classification, razon = clasificar_producto(variant, title)
-                gender = determinar_genero(full_title) if classification['is_apparel'] else None
-                
-                variant_price_str = extract_price(variant)
-                if variant_price_str == "0.00 USD": variant_price_str = base_price_str
-                
-                availability = extract_availability(product_state, variant.get('stock'))
-                
+                # --- INYECCIÓN SEO PARA VARIANTES ---
                 attributes = variant.get('attributes', {})
                 color_name = ""
                 color_obj = attributes.get('color')
@@ -246,6 +294,36 @@ def build_xml_feed():
                 size_obj = attributes.get('size')
                 if isinstance(size_obj, dict): size_name = size_obj.get('name', '')
 
+                classification, razon = clasificar_producto(variant, title)
+                
+                v_name = clean_text(raw_v_name)
+                v_name_clean = re.sub(re.escape(title), '', v_name, flags=re.IGNORECASE).strip(' -')
+                
+                temp_title = f"{title} - {v_name_clean}" if v_name_clean else title
+                gender = determinar_genero(temp_title) if classification['is_apparel'] else None
+
+                prefijo_seo = ""
+                if classification['is_apparel']:
+                    genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
+                    prefijo_seo = f"Ropa Urbana {genero_txt} - "
+                elif classification['is_art']:
+                    prefijo_seo = "Póster Decorativo - "
+
+                color_espanol = COLORES_ESPANOL.get(color_name.lower(), color_name) if color_name else ""
+
+                if color_espanol:
+                    full_title = f"{prefijo_seo}{title} Color {color_espanol}"
+                    if v_name_clean and color_name.lower() not in v_name_clean.lower():
+                         full_title += f" - {v_name_clean}"
+                else:
+                    full_title = f"{prefijo_seo}{title} - {v_name_clean}" if v_name_clean else f"{prefijo_seo}{title}"
+                # ------------------------------------
+                
+                variant_price_str = extract_price(variant)
+                if variant_price_str == "0.00 USD": variant_price_str = base_price_str
+                
+                availability = extract_availability(product_state, variant.get('stock'))
+                
                 sku = variant.get('sku', '')
                 weight = variant.get('weight', {})
                 weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
@@ -285,7 +363,7 @@ def build_xml_feed():
             <g:identifier_exists>no</g:identifier_exists>
             <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
                 
-                if color_name: item_xml_base += f"\n            <g:color><![CDATA[{color_name}]]></g:color>"
+                if color_espanol: item_xml_base += f"\n            <g:color><![CDATA[{color_espanol}]]></g:color>"
                 if size_name: item_xml_base += f"\n            <g:size><![CDATA[{size_name}]]></g:size>"
                 if sku: item_xml_base += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
                 if weight_str: item_xml_base += f"\n            <g:shipping_weight>{safe_escape(weight_str)}</g:shipping_weight>"
@@ -294,16 +372,14 @@ def build_xml_feed():
                     item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
                 item_xml_base += "\n        </item>"
                 
-                # Pinterest y Google mantienen acentos
                 pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
                 google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
                 
-                # Bing procesado sin acentos
                 bing_base = remove_accents(item_xml_base)
                 bing_desc = remove_accents(clean_description[:10000])
                 bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
                 
-            print(f"✔️ [{title[:35]}...] -> Procesado correctamente")
+            print(f"✔️ [{title[:35]}...] -> Procesado con SEO")
             
         time.sleep(0.05)
 
@@ -324,7 +400,7 @@ def build_xml_feed():
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
     
-    print(f"✅ Feeds generados exitosamente. Bing no tiene acentos.")
+    print(f"✅ Feeds generados exitosamente. Títulos SEO y colores en español aplicados.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS:
