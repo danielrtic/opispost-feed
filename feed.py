@@ -80,12 +80,18 @@ def remove_accents(text):
     if not text: return ""
     return "".join(c for c in unicodedata.normalize('NFD', str(text)) if unicodedata.category(c) != 'Mn')
 
+# --- CORRECCIÓN DEL STOCK PARA PRINT-ON-DEMAND ---
 def extract_availability(product_state, variant_stock):
-    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT': return 'out of stock'
+    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT': 
+        return 'out of stock'
+    
     if isinstance(variant_stock, dict):
         stock_type = variant_stock.get('type')
-        if stock_type == 'UNLIMITED' or stock_type == 'LIMITED':
+        if stock_type == 'UNLIMITED':
+            return 'in stock'
+        if stock_type == 'LIMITED':
             return 'in stock' if variant_stock.get('inStock', 0) > 0 else 'out of stock'
+            
     return 'in stock'
 
 def extract_price(data_dict):
@@ -156,7 +162,6 @@ def build_xml_feed():
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
-        # Función de generación de XML (La descripción se inyecta con PLACEHOLDER después)
         def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
             xml = f"""
         <item>
@@ -189,7 +194,6 @@ def build_xml_feed():
             prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
             seo_title = f"{prefijo}{title}"
             
-            # --- MAGIA ANTI CONTENIDO DUPLICADO ---
             desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. {clean_description}"
             
             xml = create_xml_item(product_id, product_id, seo_title, product_link, all_image_urls[0], base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], v_images=all_image_urls, v_gender=gender)
@@ -215,7 +219,6 @@ def build_xml_feed():
                 if v_name_clean and color_raw.lower() not in v_name_clean.lower():
                     full_title += f" - {v_name_clean}"
                 
-                # --- MAGIA ANTI CONTENIDO DUPLICADO PARA VARIANTES ---
                 desc_unica = f"{full_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
                 
                 v_images = [img.get('url') for img in variant.get('images', [])] or all_image_urls
@@ -239,7 +242,7 @@ def build_xml_feed():
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
-    print("✅ Feeds generados con éxito con Títulos y Descripciones SEO Únicas.")
+    print("✅ Feeds generados con éxito con Títulos y Descripciones SEO Únicas, y Stock ilimitado corregido.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS: print("❌ Credenciales faltantes")
