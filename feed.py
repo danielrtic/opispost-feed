@@ -29,48 +29,23 @@ session.headers.update({
 # TRADUCCIÓN DE COLORES PARA SEO EN ESPAÑOL
 # ==========================================
 COLORES_ESPANOL = {
-    "black": "Negro",
-    "dark chocolate": "Marrón Chocolate",
-    "navy": "Azul Marino",
-    "true navy": "Azul Marino",
-    "purple": "Morado",
-    "maroon": "Granate",
-    "forest green": "Verde Bosque",
-    "heather navy": "Azul Marino Jaspeado",
-    "dark heather grey": "Gris Oscuro",
-    "dark heather": "Gris Oscuro",
-    "graphite heather": "Gris Grafito",
-    "royal": "Azul Real",
-    "military green": "Verde Militar",
-    "charcoal": "Gris Carbón",
-    "sapphire": "Azul Zafiro",
-    "heather indigo": "Índigo Jaspeado",
-    "heather red": "Rojo Jaspeado",
-    "red": "Rojo",
-    "brick": "Rojo Ladrillo",
-    "berry": "Frambuesa",
-    "flo blue": "Azul Eléctrico",
-    "watermelon": "Rosa Sandía",
-    "grey": "Gris",
-    "violet": "Violeta",
-    "butter": "Amarillo Pastel",
-    "heather royal": "Azul Real Jaspeado",
-    "kelly green": "Verde Esmeralda",
-    "heliconia": "Rosa Fucsia",
-    "orange": "Naranja",
-    "tropical blue": "Azul Tropical",
-    "irish green": "Verde Vivo",
-    "jade dome": "Verde Jade",
-    "heather irish green": "Verde Vivo Jaspeado",
-    "coral silk": "Color Coral",
-    "sand": "Color Arena",
-    "sport grey": "Gris Jaspeado",
-    "light blue": "Azul Claro",
-    "daisy": "Amarillo",
-    "ice grey": "Gris Claro",
-    "white": "Blanco",
-    "cornsilk": "Beige",
-    "natural": "Crudo / Natural"
+    "black": "Negro", "dark chocolate": "Marrón Chocolate", "navy": "Azul Marino",
+    "true navy": "Azul Marino", "purple": "Morado", "maroon": "Granate",
+    "forest green": "Verde Bosque", "heather navy": "Azul Marino Jaspeado",
+    "dark heather grey": "Gris Oscuro", "dark heather": "Gris Oscuro",
+    "graphite heather": "Gris Grafito", "royal": "Azul Real",
+    "military green": "Verde Militar", "charcoal": "Gris Carbón",
+    "sapphire": "Azul Zafiro", "heather indigo": "Índigo Jaspeado",
+    "heather red": "Rojo Jaspeado", "red": "Rojo", "brick": "Rojo Ladrillo",
+    "berry": "Frambuesa", "flo blue": "Azul Eléctrico", "watermelon": "Rosa Sandía",
+    "grey": "Gris", "violet": "Violeta", "butter": "Amarillo Pastel",
+    "heather royal": "Azul Real Jaspeado", "kelly green": "Verde Esmeralda",
+    "heliconia": "Rosa Fucsia", "orange": "Naranja", "tropical blue": "Azul Tropical",
+    "irish green": "Verde Vivo", "jade dome": "Verde Jade",
+    "heather irish green": "Verde Vivo Jaspeado", "coral silk": "Coral",
+    "sand": "Arena", "sport grey": "Gris Jaspeado", "light blue": "Azul Claro",
+    "daisy": "Amarillo", "ice grey": "Gris Claro", "white": "Blanco",
+    "cornsilk": "Beige", "natural": "Crudo / Natural"
 }
 
 CATEGORIAS = {
@@ -96,10 +71,8 @@ def clean_text(text):
     text = html.unescape(text)
     text = text.replace('\xa0', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
-    
     text = re.sub(r'[\u2600-\u27BF]', '', text)
     text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
-    
     text = text.replace("Copy of ", "").replace("Copy of", "")
     return " ".join(text.split()).strip()
 
@@ -108,13 +81,10 @@ def remove_accents(text):
     return "".join(c for c in unicodedata.normalize('NFD', str(text)) if unicodedata.category(c) != 'Mn')
 
 def extract_availability(product_state, variant_stock):
-    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT':
-        return 'out of stock'
+    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT': return 'out of stock'
     if isinstance(variant_stock, dict):
         stock_type = variant_stock.get('type')
-        if stock_type == 'UNLIMITED': 
-            return 'in stock'
-        if stock_type == 'LIMITED':
+        if stock_type == 'UNLIMITED' or stock_type == 'LIMITED':
             return 'in stock' if variant_stock.get('inStock', 0) > 0 else 'out of stock'
     return 'in stock'
 
@@ -135,275 +105,142 @@ def clasificar_producto(variant, title):
     if any(w in t for w in ['funda', 'case', 'sleeve', 'fundas para portátil']): return CATEGORIAS["accessories"], "Título (Accesorio)"
     if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro', 'canvas']): return CATEGORIAS["art"], "Título (Arte)"
     if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa', 'top', 'vestido']): return CATEGORIAS["apparel"], "Título (Ropa)"
-
+    
     attrs = variant.get('attributes', {})
     size_obj = attrs.get('size', {})
     size_name = str(size_obj.get('name', '')).lower().strip() if isinstance(size_obj, dict) else str(size_obj).lower().strip()
-            
     if size_name:
-        if 'oz' in size_name or 'onza' in size_name: return CATEGORIAS["drinkware"], f"Atributo Talla ({size_name})"
-        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl', 'small', 'medium', 'large']: return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
-        if 'x' in size_name and any(m in size_name for m in ['"', 'cm', 'in', 'mm']): return CATEGORIAS["art"], f"Atributo Medida ({size_name})"
-
+        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl']: return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
     return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def determinar_genero(title):
     t_lower = title.lower()
-    if any(w in t_lower for w in ['mujer', 'chica', 'women', 'ladies', 'crop top', 'vestido', 'falda']):
-        return "female"
-    elif any(w in t_lower for w in ['hombre', 'chico', 'men', 'mens']):
-        return "male"
+    if any(w in t_lower for w in ['mujer', 'chica', 'women', 'ladies', 'crop top', 'vestido', 'falda']): return "female"
+    elif any(w in t_lower for w in ['hombre', 'chico', 'men', 'mens']): return "male"
     return "unisex"
 
 def get_all_products_summary():
-    products = []
-    page = 0 
-    total_pages = 1
-    print("📦 Conectando a Open API y descargando catálogo completo...")
-    
+    products, page, total_pages = [], 0, 1
+    print("📦 Descargando catálogo...")
     while page < total_pages:
         url = f"{BASE_API_URL}/products?page={page}&size=50"
-        print(f"-> Descargando página {page}...")
-        
         response = session.get(url)
         if response.status_code == 200:
             data = response.json()
             items = data.get('results', [])
             if not items: break
             products.extend(items)
-            print(f"   + {len(items)} productos base encontrados.")
             total_pages = data.get('totalPages', 1)
             page += 1
-        else:
-            print(f"❌ Error API listando productos: {response.status_code}")
-            break
-            
+        else: break
     return products
 
 def build_xml_feed():
     summary_products = get_all_products_summary()
-    if not summary_products:
-        print("⚠️ No se encontraron productos.")
-        return
-
-    pinterest_items = []
-    google_items = []
-    bing_items = []
-    
-    print(f"\n🔍 Procesando {len(summary_products)} productos base (Limpiando HTML y aplicando SEO Español)...")
+    pinterest_items, google_items, bing_items = [], [], []
 
     for summary in summary_products:
         product_id = summary.get('id')
-        raw_title = summary.get('name', 'Producto sin nombre')
-        title = clean_text(raw_title)
+        title = clean_text(summary.get('name', 'Producto'))
         slug = summary.get('slug', '')
+        detailed_product = session.get(f"{BASE_API_URL}/products/{product_id}").json()
         
-        url_detail = f"{BASE_API_URL}/products/{product_id}"
-        resp_detail = session.get(url_detail)
-        detailed_product = resp_detail.json() if resp_detail.status_code == 200 else summary
+        if detailed_product.get('access', {}).get('type', 'PUBLIC') != 'PUBLIC': continue
 
-        access_info = detailed_product.get('access', {})
-        access_type = access_info.get('type', 'PUBLIC') if isinstance(access_info, dict) else 'PUBLIC'
-        
-        if access_type != 'PUBLIC':
-            continue
+        all_image_urls = [img.get('url') for img in detailed_product.get('images', []) if isinstance(img, dict)]
+        if not all_image_urls: continue
 
-        raw_images = detailed_product.get('images', [])
-        all_image_urls = []
-        for img in raw_images:
-            img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
-            if img_url and img_url not in all_image_urls: all_image_urls.append(img_url)
-
-        if not all_image_urls:
-            continue
-
-        raw_description = detailed_product.get('description', '')
-        clean_description = clean_text(raw_description)
-        if not clean_description: clean_description = title
-        
+        clean_description = clean_text(detailed_product.get('description', '')) or title
         product_link = f"{STORE_URL}/products/{slug}"
         product_state = detailed_product.get('state', {})
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
-        # ==========================================
-        # PRODUCTOS SIN VARIANTES
-        # ==========================================
-        if not variants:
-            classification, razon = clasificar_producto({}, title)
-            main_image_link = all_image_urls[0] if all_image_urls else ""
-            gender = determinar_genero(title) if classification['is_apparel'] else None
-            
-            # --- INYECCIÓN SEO BASE ---
-            prefijo_seo = ""
-            if classification['is_apparel']:
-                genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
-                prefijo_seo = f"Ropa Urbana {genero_txt} - "
-            elif classification['is_art']:
-                prefijo_seo = "Póster Decorativo - "
-                
-            seo_title = f"{prefijo_seo}{title}"
-            # --------------------------
-            
-            item_xml_base = f"""
+        # Función de generación de XML (La descripción se inyecta con PLACEHOLDER después)
+        def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
+            xml = f"""
         <item>
-            <g:id>{safe_escape(product_id)}</g:id>
-            <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title><![CDATA[{seo_title[:150]}]]></g:title>
+            <g:id>{safe_escape(v_id)}</g:id>
+            <g:item_group_id>{safe_escape(v_group_id)}</g:item_group_id>
+            <g:title><![CDATA[{v_title[:150]}]]></g:title>
             <!-- DESC_PLACEHOLDER -->
-            <g:link>{safe_escape(product_link)}</g:link>
-            <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
-            
-            for add_img in all_image_urls[1:11]:
-                item_xml_base += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
-
-            item_xml_base += f"""
-            <g:price>{safe_escape(base_price_str)}</g:price>
-            <g:availability>{extract_availability(product_state, {})}</g:availability>
+            <g:link>{safe_escape(v_link)}</g:link>
+            <g:image_link>{safe_escape(v_img)}</g:image_link>"""
+            if v_images:
+                for add_img in v_images[1:11]:
+                    if add_img != v_img: xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+            xml += f"""
+            <g:price>{safe_escape(v_price)}</g:price>
+            <g:availability>{v_availability}</g:availability>
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
             <g:identifier_exists>no</g:identifier_exists>
-            <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
+            <g:google_product_category><![CDATA[{v_cat}]]></g:google_product_category>"""
+            if v_color: xml += f"\n            <g:color><![CDATA[{v_color}]]></g:color>"
+            if v_size: xml += f"\n            <g:size><![CDATA[{v_size}]]></g:size>"
+            if v_gender: xml += f"\n            <g:gender>{v_gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
+            xml += "\n        </item>"
+            return xml
+
+        if not variants:
+            cat_obj, _ = clasificar_producto({}, title)
+            gender = determinar_genero(title) if cat_obj['is_apparel'] else None
             
-            if gender:
-                item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
-            item_xml_base += "\n        </item>"
+            prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
+            seo_title = f"{prefijo}{title}"
             
-            pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
-            google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
+            # --- MAGIA ANTI CONTENIDO DUPLICADO ---
+            desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. {clean_description}"
             
-            bing_base = remove_accents(item_xml_base)
-            bing_desc = remove_accents(clean_description[:10000])
+            xml = create_xml_item(product_id, product_id, seo_title, product_link, all_image_urls[0], base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], v_images=all_image_urls, v_gender=gender)
+            
+            pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
+            google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
+            bing_base = remove_accents(xml)
+            bing_desc = remove_accents(desc_unica[:10000])
             bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
-            
-        # ==========================================
-        # PRODUCTOS CON VARIANTES
-        # ==========================================
         else:
             for variant in variants:
-                variant_id = variant.get('id', product_id)
-                raw_v_name = variant.get('name', '')
-                
-                # --- INYECCIÓN SEO PARA VARIANTES ---
-                attributes = variant.get('attributes', {})
-                color_name = ""
-                color_obj = attributes.get('color')
-                if isinstance(color_obj, dict): color_name = color_obj.get('name', '')
-                
-                size_name = ""
-                size_obj = attributes.get('size')
-                if isinstance(size_obj, dict): size_name = size_obj.get('name', '')
-
-                classification, razon = clasificar_producto(variant, title)
-                
-                v_name = clean_text(raw_v_name)
+                v_id = variant.get('id', product_id)
+                v_name = clean_text(variant.get('name', ''))
                 v_name_clean = re.sub(re.escape(title), '', v_name, flags=re.IGNORECASE).strip(' -')
+                cat_obj, _ = clasificar_producto(variant, title)
                 
-                temp_title = f"{title} - {v_name_clean}" if v_name_clean else title
-                gender = determinar_genero(temp_title) if classification['is_apparel'] else None
-
-                prefijo_seo = ""
-                if classification['is_apparel']:
-                    genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
-                    prefijo_seo = f"Ropa Urbana {genero_txt} - "
-                elif classification['is_art']:
-                    prefijo_seo = "Póster Decorativo - "
-
-                color_espanol = COLORES_ESPANOL.get(color_name.lower(), color_name) if color_name else ""
-
-                if color_espanol:
-                    full_title = f"{prefijo_seo}{title} Color {color_espanol}"
-                    if v_name_clean and color_name.lower() not in v_name_clean.lower():
-                         full_title += f" - {v_name_clean}"
-                else:
-                    full_title = f"{prefijo_seo}{title} - {v_name_clean}" if v_name_clean else f"{prefijo_seo}{title}"
-                # ------------------------------------
+                color_raw = variant.get('attributes', {}).get('color', {}).get('name', '')
+                color_es = COLORES_ESPANOL.get(color_raw.lower(), color_raw)
+                gender = determinar_genero(f"{title} {v_name_clean}") if cat_obj['is_apparel'] else None
+                prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
                 
-                variant_price_str = extract_price(variant)
-                if variant_price_str == "0.00 USD": variant_price_str = base_price_str
+                full_title = f"{prefijo}{title} Color {color_es}" if color_es else f"{prefijo}{title}"
+                if v_name_clean and color_raw.lower() not in v_name_clean.lower():
+                    full_title += f" - {v_name_clean}"
                 
-                availability = extract_availability(product_state, variant.get('stock'))
+                # --- MAGIA ANTI CONTENIDO DUPLICADO PARA VARIANTES ---
+                desc_unica = f"{full_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
                 
-                sku = variant.get('sku', '')
-                weight = variant.get('weight', {})
-                weight_str = f"{weight.get('value')} {weight.get('unit', 'g')}" if isinstance(weight, dict) and weight.get('value') else ""
-
-                raw_var_images = variant.get('images', [])
-                var_image_urls = []
-                for img in raw_var_images:
-                    img_url = img.get('url', '') if isinstance(img, dict) else img if isinstance(img, str) else ""
-                    if img_url and img_url not in var_image_urls: var_image_urls.append(img_url)
-
-                var_thumb = variant.get('thumbnailImage', {})
-                main_image_link = var_thumb.get('url') if isinstance(var_thumb, dict) and var_thumb.get('url') else ""
+                v_images = [img.get('url') for img in variant.get('images', [])] or all_image_urls
+                v_img = variant.get('thumbnailImage', {}).get('url') or v_images[0]
                 
-                if not main_image_link:
-                    main_image_link = var_image_urls[0] if var_image_urls else (all_image_urls[0] if all_image_urls else "")
+                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], v_color=color_es, v_size=variant.get('attributes',{}).get('size',{}).get('name'), v_images=v_images, v_gender=gender)
                 
-                images_to_use = var_image_urls if var_image_urls else all_image_urls
-
-                item_xml_base = f"""
-        <item>
-            <g:id>{safe_escape(variant_id)}</g:id>
-            <g:item_group_id>{safe_escape(product_id)}</g:item_group_id>
-            <g:title><![CDATA[{full_title[:150]}]]></g:title>
-            <!-- DESC_PLACEHOLDER -->
-            <g:link>{safe_escape(f"{product_link}?variant={variant_id}")}</g:link>
-            <g:image_link>{safe_escape(main_image_link)}</g:image_link>"""
-                
-                for add_img in images_to_use[:11]:
-                    if add_img != main_image_link: 
-                        item_xml_base += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
-
-                item_xml_base += f"""
-            <g:price>{safe_escape(variant_price_str)}</g:price>
-            <g:availability>{availability}</g:availability>
-            <g:condition>new</g:condition>
-            <g:brand>Opispot</g:brand>
-            <g:identifier_exists>no</g:identifier_exists>
-            <g:google_product_category><![CDATA[{classification['gpc']}]]></g:google_product_category>"""
-                
-                if color_espanol: item_xml_base += f"\n            <g:color><![CDATA[{color_espanol}]]></g:color>"
-                if size_name: item_xml_base += f"\n            <g:size><![CDATA[{size_name}]]></g:size>"
-                if sku: item_xml_base += f"\n            <g:mpn>{safe_escape(sku)}</g:mpn>"
-                if weight_str: item_xml_base += f"\n            <g:shipping_weight>{safe_escape(weight_str)}</g:shipping_weight>"
-                
-                if gender:
-                    item_xml_base += f"\n            <g:gender>{gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
-                item_xml_base += "\n        </item>"
-                
-                pinterest_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:500]}]]></g:description>"))
-                google_items.append(item_xml_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{clean_description[:5000]}]]></g:description>"))
-                
-                bing_base = remove_accents(item_xml_base)
-                bing_desc = remove_accents(clean_description[:10000])
+                pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
+                google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
+                bing_base = remove_accents(xml)
+                bing_desc = remove_accents(desc_unica[:10000])
                 bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
-                
-            print(f"✔️ [{title[:35]}...] -> Procesado con SEO")
-            
-        time.sleep(0.05)
+        
+        print(f"✔️ {title[:30]}... procesado")
 
+    # Guardado final
     def write_feed(filename, items_list):
-        final_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
-    <channel>
-        <title>Opispot</title>
-        <link>{STORE_URL}</link>
-        <description>Catálogo oficial de productos</description>
-        {''.join(items_list)}
-    </channel>
-</rss>"""
         with open(filename, 'w', encoding='utf-8-sig') as f:
-            f.write(final_xml)
+            f.write(f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:g="http://base.google.com/ns/1.0"><channel><title>Opispot</title><link>{STORE_URL}</link>{"".join(items_list)}</channel></rss>')
 
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
-    
-    print(f"✅ Feeds generados exitosamente. Títulos SEO y colores en español aplicados.")
+    print("✅ Feeds generados con éxito con Títulos y Descripciones SEO Únicas.")
 
 if __name__ == "__main__":
-    if not API_USER or not API_PASS:
-        print("❌ Error: Faltan las credenciales.")
-    else:
-        build_xml_feed()
+    if not API_USER or not API_PASS: print("❌ Credenciales faltantes")
+    else: build_xml_feed()
