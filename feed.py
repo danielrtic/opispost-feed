@@ -48,16 +48,26 @@ COLORES_ESPANOL = {
     "cornsilk": "Beige", "natural": "Crudo / Natural"
 }
 
+# ==========================================
+# SUB-CATEGORÍAS Y PRODUCT TYPES
+# ==========================================
 CATEGORIAS = {
-    "apparel": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True, "is_art": False},
-    "drinkware": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "is_apparel": False, "is_art": False},
-    "art": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "is_apparel": False, "is_art": True},
-    "stationery": {"gpc": "Office Supplies > Office Instruments > Notebooks & Notepads", "is_apparel": False, "is_art": False},
-    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "is_apparel": False, "is_art": False},
-    "accessories": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "is_apparel": False, "is_art": False}
+    "hoodie": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "pt": "Ropa Urbana > Sudaderas con Capucha", "is_apparel": True, "is_art": False},
+    "sudadera": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "pt": "Ropa Urbana > Sudaderas", "is_apparel": True, "is_art": False},
+    "shirt": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "pt": "Ropa Urbana > Camisetas", "is_apparel": True, "is_art": False},
+    "camiseta": {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "pt": "Ropa Urbana > Camisetas", "is_apparel": True, "is_art": False},
+    "gorra": {"gpc": "Apparel & Accessories > Clothing > Accessories > Hats", "pt": "Accesorios > Gorras", "is_apparel": True, "is_art": False},
+    "taza": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "pt": "Hogar > Tazas", "is_apparel": False, "is_art": False},
+    "mug": {"gpc": "Home & Garden > Kitchen & Dining > Tableware > Drinkware > Mugs", "pt": "Hogar > Tazas", "is_apparel": False, "is_art": False},
+    "poster": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "pt": "Decoración > Pósters", "is_apparel": False, "is_art": True},
+    "lienzo": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "pt": "Decoración > Lienzos", "is_apparel": False, "is_art": True},
+    "canvas": {"gpc": "Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork", "pt": "Decoración > Lienzos", "is_apparel": False, "is_art": True},
+    "funda": {"gpc": "Electronics > Electronics Accessories > Computer Components > Computer Accessories > Laptop Accessories > Laptop Cases", "pt": "Accesorios > Fundas", "is_apparel": False, "is_art": False},
+    "sticker": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "pt": "Papelería > Pegatinas", "is_apparel": False, "is_art": False},
+    "pegatina": {"gpc": "Arts & Entertainment > Hobbies & Creative Arts > Arts & Crafts > Art & Crafting Materials > Embellishments & Trims > Stickers", "pt": "Papelería > Pegatinas", "is_apparel": False, "is_art": False}
 }
 
-CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "is_apparel": True, "is_art": False}
+CATEGORIA_DEFAULT = {"gpc": "Apparel & Accessories > Clothing > Shirts & Tops", "pt": "Ropa Urbana > Ropa y Accesorios", "is_apparel": True, "is_art": False}
 
 def safe_escape(val):
     if not val: return ""
@@ -80,18 +90,13 @@ def remove_accents(text):
     if not text: return ""
     return "".join(c for c in unicodedata.normalize('NFD', str(text)) if unicodedata.category(c) != 'Mn')
 
-# --- CORRECCIÓN DEL STOCK PARA PRINT-ON-DEMAND ---
 def extract_availability(product_state, variant_stock):
-    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT': 
-        return 'out of stock'
-    
+    if isinstance(product_state, dict) and product_state.get('type') == 'SOLD_OUT': return 'out of stock'
     if isinstance(variant_stock, dict):
         stock_type = variant_stock.get('type')
-        if stock_type == 'UNLIMITED':
-            return 'in stock'
+        if stock_type == 'UNLIMITED': return 'in stock'
         if stock_type == 'LIMITED':
             return 'in stock' if variant_stock.get('inStock', 0) > 0 else 'out of stock'
-            
     return 'in stock'
 
 def extract_price(data_dict):
@@ -105,18 +110,23 @@ def extract_price(data_dict):
 
 def clasificar_producto(variant, title):
     t = title.lower()
-    if any(w in t for w in ['sticker', 'pegatina']): return CATEGORIAS["sticker"], "Título (Sticker)"
-    if any(w in t for w in ['taza', 'mug', 'vaso']): return CATEGORIAS["drinkware"], "Título (Taza/Mug)"
-    if any(w in t for w in ['libreta', 'notebook', 'cuaderno']): return CATEGORIAS["stationery"], "Título (Libreta)"
-    if any(w in t for w in ['funda', 'case', 'sleeve', 'fundas para portátil']): return CATEGORIAS["accessories"], "Título (Accesorio)"
-    if any(w in t for w in ['poster', 'print', 'lienzo', 'cuadro', 'canvas']): return CATEGORIAS["art"], "Título (Arte)"
-    if any(w in t for w in ['camiseta', 'shirt', 'hoodie', 'sudadera', 'gorra', 'ropa', 'top', 'vestido']): return CATEGORIAS["apparel"], "Título (Ropa)"
     
+    # 1. Intentar clasificar por atributos físicos (como Oz para tazas)
     attrs = variant.get('attributes', {})
     size_obj = attrs.get('size', {})
     size_name = str(size_obj.get('name', '')).lower().strip() if isinstance(size_obj, dict) else str(size_obj).lower().strip()
-    if size_name:
-        if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl']: return CATEGORIAS["apparel"], f"Atributo Talla ({size_name})"
+    
+    if 'oz' in size_name or 'onza' in size_name: return CATEGORIAS["taza"], "Atributo Oz"
+    
+    # 2. Buscar palabras clave en el título
+    for key, cat_data in CATEGORIAS.items():
+        if key in t:
+            return cat_data, f"Palabra clave: {key}"
+            
+    # 3. Fallback genérico por talla de ropa
+    if size_name in ['xs', 's', 'm', 'l', 'xl', 'xxl', '2xl', '3xl', '4xl', '5xl']: 
+        return CATEGORIAS["shirt"], f"Atributo Talla ({size_name})"
+        
     return CATEGORIA_DEFAULT, "Valor por Defecto"
 
 def determinar_genero(title):
@@ -124,6 +134,37 @@ def determinar_genero(title):
     if any(w in t_lower for w in ['mujer', 'chica', 'women', 'ladies', 'crop top', 'vestido', 'falda']): return "female"
     elif any(w in t_lower for w in ['hombre', 'chico', 'men', 'mens']): return "male"
     return "unisex"
+
+# --- NUEVA FUNCIÓN: DETECCIÓN DE MATERIAL Y PATRÓN ---
+def extraer_material_y_patron(title, description, cat_obj):
+    text_to_search = (title + " " + description).lower()
+    material, pattern = "", ""
+    
+    # Detección de Material
+    if cat_obj['is_apparel']:
+        if 'cotton' in text_to_search or 'algodón' in text_to_search or 'algodon' in text_to_search:
+            material = "Algodón"
+            if 'polyester' in text_to_search or 'poliéster' in text_to_search or 'poliester' in text_to_search:
+                material = "Mezcla de Algodón y Poliéster"
+        elif 'polyester' in text_to_search or 'poliéster' in text_to_search or 'poliester' in text_to_search:
+            material = "Poliéster"
+    elif 'taza' in text_to_search or 'mug' in text_to_search or 'ceramic' in text_to_search or 'cerámica' in text_to_search:
+        material = "Cerámica"
+    elif 'poster' in text_to_search or 'paper' in text_to_search or 'papel' in text_to_search:
+        material = "Papel"
+    elif 'canvas' in text_to_search or 'lienzo' in text_to_search:
+        material = "Lienzo"
+        
+    # Detección de Patrón / Estampado
+    if cat_obj['is_apparel'] or cat_obj.get('pt', '').startswith('Accesorios'):
+        if 'bordado' in text_to_search or 'embroidery' in text_to_search or 'stitched' in text_to_search:
+            pattern = "Bordado"
+        elif 'estampado' in text_to_search or 'print' in text_to_search or 'graphic' in text_to_search or 'dtg' in text_to_search or 'dtfx' in text_to_search:
+            pattern = "Estampado Gráfico"
+        else:
+            pattern = "Estampado"
+
+    return material, pattern
 
 def get_all_products_summary():
     products, page, total_pages = [], 0, 1
@@ -162,7 +203,8 @@ def build_xml_feed():
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
-        def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
+        # Creador de items XML adaptado con Product Type, Material y Patrón
+        def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_pt, v_mat=None, v_pat=None, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
             xml = f"""
         <item>
             <g:id>{safe_escape(v_id)}</g:id>
@@ -180,23 +222,28 @@ def build_xml_feed():
             <g:condition>new</g:condition>
             <g:brand>Opispot</g:brand>
             <g:identifier_exists>no</g:identifier_exists>
-            <g:google_product_category><![CDATA[{v_cat}]]></g:google_product_category>"""
+            <g:google_product_category><![CDATA[{v_cat}]]></g:google_product_category>
+            <g:product_type><![CDATA[{v_pt}]]></g:product_type>"""
             if v_color: xml += f"\n            <g:color><![CDATA[{v_color}]]></g:color>"
             if v_size: xml += f"\n            <g:size><![CDATA[{v_size}]]></g:size>"
+            if v_mat: xml += f"\n            <g:material><![CDATA[{v_mat}]]></g:material>"
+            if v_pat: xml += f"\n            <g:pattern><![CDATA[{v_pat}]]></g:pattern>"
             if v_gender: xml += f"\n            <g:gender>{v_gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
+            if v_sku: xml += f"\n            <g:mpn>{safe_escape(v_sku)}</g:mpn>"
             xml += "\n        </item>"
             return xml
 
         if not variants:
             cat_obj, _ = clasificar_producto({}, title)
             gender = determinar_genero(title) if cat_obj['is_apparel'] else None
+            mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
             
             prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
             seo_title = f"{prefijo}{title}"
             
-            desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. {clean_description}"
+            desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
             
-            xml = create_xml_item(product_id, product_id, seo_title, product_link, all_image_urls[0], base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], v_images=all_image_urls, v_gender=gender)
+            xml = create_xml_item(product_id, product_id, seo_title, product_link, all_image_urls[0], base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_images=all_image_urls, v_gender=gender)
             
             pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
             google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
@@ -212,7 +259,11 @@ def build_xml_feed():
                 
                 color_raw = variant.get('attributes', {}).get('color', {}).get('name', '')
                 color_es = COLORES_ESPANOL.get(color_raw.lower(), color_raw)
+                sku = variant.get('sku', '')
+                
                 gender = determinar_genero(f"{title} {v_name_clean}") if cat_obj['is_apparel'] else None
+                mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
+                
                 prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
                 
                 full_title = f"{prefijo}{title} Color {color_es}" if color_es else f"{prefijo}{title}"
@@ -224,7 +275,7 @@ def build_xml_feed():
                 v_images = [img.get('url') for img in variant.get('images', [])] or all_image_urls
                 v_img = variant.get('thumbnailImage', {}).get('url') or v_images[0]
                 
-                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], v_color=color_es, v_size=variant.get('attributes',{}).get('size',{}).get('name'), v_images=v_images, v_gender=gender)
+                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=variant.get('attributes',{}).get('size',{}).get('name'), v_sku=sku, v_images=v_images, v_gender=gender)
                 
                 pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
                 google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
@@ -242,7 +293,7 @@ def build_xml_feed():
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
-    print("✅ Feeds generados con éxito con Títulos y Descripciones SEO Únicas, y Stock ilimitado corregido.")
+    print("✅ Feeds generados con éxito: Categorías avanzadas, Materiales, Patrones y Stock corregido.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS: print("❌ Credenciales faltantes")
