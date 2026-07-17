@@ -203,7 +203,6 @@ def build_xml_feed():
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
-        # Creador de items XML adaptado con Product Type, Material y Patrón
         def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_pt, v_mat=None, v_pat=None, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
             xml = f"""
         <item>
@@ -238,8 +237,17 @@ def build_xml_feed():
             gender = determinar_genero(title) if cat_obj['is_apparel'] else None
             mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
             
-            prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
-            seo_title = f"{prefijo}{title}"
+            # Generación del prefijo sin el guion final
+            if cat_obj['is_apparel']:
+                genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
+                prefijo = f"Ropa Urbana {genero_txt}"
+            elif cat_obj['is_art']:
+                prefijo = "Póster Decorativo"
+            else:
+                prefijo = ""
+            
+            # TÍTULO MODIFICADO: Producto primero
+            seo_title = f"{title} - {prefijo}" if prefijo else title
             
             desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
             
@@ -264,9 +272,19 @@ def build_xml_feed():
                 gender = determinar_genero(f"{title} {v_name_clean}") if cat_obj['is_apparel'] else None
                 mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
                 
-                prefijo = "Ropa Urbana " + ("Unisex" if gender=="unisex" else ("Hombre" if gender=="male" else "Mujer")) + " - " if cat_obj['is_apparel'] else ("Póster Decorativo - " if cat_obj['is_art'] else "")
+                # Generación del prefijo sin el guion final
+                if cat_obj['is_apparel']:
+                    genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
+                    prefijo = f"Ropa Urbana {genero_txt}"
+                elif cat_obj['is_art']:
+                    prefijo = "Póster Decorativo"
+                else:
+                    prefijo = ""
                 
-                full_title = f"{prefijo}{title} Color {color_es}" if color_es else f"{prefijo}{title}"
+                # TÍTULOS MODIFICADOS: Producto primero, luego prefijo, luego color/variante
+                base_title = f"{title} - {prefijo}" if prefijo else title
+                full_title = f"{base_title} - Color {color_es}" if color_es else base_title
+                
                 if v_name_clean and color_raw.lower() not in v_name_clean.lower():
                     full_title += f" - {v_name_clean}"
                 
