@@ -45,7 +45,7 @@ COLORES_ESPANOL = {
     "heather irish green": "Verde Vivo Jaspeado", "coral silk": "Coral",
     "sand": "Arena", "sport grey": "Gris Jaspeado", "light blue": "Azul Claro",
     "daisy": "Amarillo", "ice grey": "Gris Claro", "white": "Blanco",
-    "cornsilk": "Beige", "natural": "Crudo / Natural"
+    "cornsilk": "Beige", "natural": "Crudo / Natural", "green": "Verde"
 }
 
 # ==========================================
