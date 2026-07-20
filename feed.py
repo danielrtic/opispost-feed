@@ -83,10 +83,10 @@ def clean_text(text):
     if not text: return ""
     text = html.unescape(str(text))
     text = html.unescape(text)
-    text = text.replace(' ', ' ')
+    text = text.replace('\xa0', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
-    text = re.sub(r'[☀-➿]', '', text)
-    text = re.sub(r'[𐀀-?]', '', text)
+    text = re.sub(r'[\u2600-\u27BF]', '', text)
+    text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
     text = text.replace("Copy of ", "").replace("Copy of", "")
     return " ".join(text.split()).strip()
 
@@ -217,8 +217,7 @@ def build_xml_feed():
             <g:image_link>{safe_escape(v_img)}</g:image_link>"""
             if v_images:
                 for add_img in v_images[1:11]:
-                    if add_img != v_img: xml += f"
-            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+                    if add_img != v_img: xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
             xml += f"""
             <g:price>{safe_escape(v_price)}</g:price>
             <g:availability>{v_availability}</g:availability>
@@ -227,21 +226,13 @@ def build_xml_feed():
             <g:identifier_exists>no</g:identifier_exists>
             <g:google_product_category><![CDATA[{v_cat}]]></g:google_product_category>
             <g:product_type><![CDATA[{v_pt}]]></g:product_type>"""
-            if v_color: xml += f"
-            <g:color><![CDATA[{v_color}]]></g:color>"
-            if v_size: xml += f"
-            <g:size><![CDATA[{v_size}]]></g:size>"
-            if v_mat: xml += f"
-            <g:material><![CDATA[{v_mat}]]></g:material>"
-            if v_pat: xml += f"
-            <g:pattern><![CDATA[{v_pat}]]></g:pattern>"
-            if v_gender: xml += f"
-            <g:gender>{v_gender}</g:gender>
-            <g:age_group>adult</g:age_group>"
-            if v_sku: xml += f"
-            <g:mpn>{safe_escape(v_sku)}</g:mpn>"
-            xml += "
-        </item>"
+            if v_color: xml += f"\n            <g:color><![CDATA[{v_color}]]></g:color>"
+            if v_size: xml += f"\n            <g:size><![CDATA[{v_size}]]></g:size>"
+            if v_mat: xml += f"\n            <g:material><![CDATA[{v_mat}]]></g:material>"
+            if v_pat: xml += f"\n            <g:pattern><![CDATA[{v_pat}]]></g:pattern>"
+            if v_gender: xml += f"\n            <g:gender>{v_gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
+            if v_sku: xml += f"\n            <g:mpn>{safe_escape(v_sku)}</g:mpn>"
+            xml += "\n        </item>"
             return xml
 
         if not variants:
