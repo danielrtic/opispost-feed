@@ -35,17 +35,21 @@ COLORES_ESPANOL = {
     "dark heather grey": "Gris Oscuro", "dark heather": "Gris Oscuro",
     "graphite heather": "Gris Grafito", "royal": "Azul Real",
     "military green": "Verde Militar", "charcoal": "Gris Carbón",
-    "sapphire": "Azul Zafiro", "heather indigo": "Índigo Jaspeado",
+    "sapphire": "Azul Zafiro", "heather indigo": "Azul Índigo Jaspeado",
     "heather red": "Rojo Jaspeado", "red": "Rojo", "brick": "Rojo Ladrillo",
-    "berry": "Frambuesa", "flo blue": "Azul Eléctrico", "watermelon": "Rosa Sandía",
+    "berry": "Rosa Frambuesa",
+    "flo blue": "Azul Eléctrico", "watermelon": "Rosa Sandía",
     "grey": "Gris", "violet": "Violeta", "butter": "Amarillo Pastel",
     "heather royal": "Azul Real Jaspeado", "kelly green": "Verde Esmeralda",
     "heliconia": "Rosa Fucsia", "orange": "Naranja", "tropical blue": "Azul Tropical",
     "irish green": "Verde Vivo", "jade dome": "Verde Jade",
-    "heather irish green": "Verde Vivo Jaspeado", "coral silk": "Coral",
-    "sand": "Arena", "sport grey": "Gris Jaspeado", "light blue": "Azul Claro",
+    "heather irish green": "Verde Vivo Jaspeado", "coral silk": "Rosa Coral",
+    "sand": "Beige Arena",
+    "sport grey": "Gris Jaspeado", "light blue": "Azul Claro",
     "daisy": "Amarillo", "ice grey": "Gris Claro", "white": "Blanco",
-    "cornsilk": "Beige", "natural": "Crudo / Natural", "green": "Verde"
+    "cornsilk": "Beige", 
+    "natural": "Beige Crudo",
+    "green": "Verde"
 }
 
 # ==========================================
@@ -79,10 +83,10 @@ def clean_text(text):
     if not text: return ""
     text = html.unescape(str(text))
     text = html.unescape(text)
-    text = text.replace('\xa0', ' ')
+    text = text.replace(' ', ' ')
     text = re.sub(r'<[^>]+>', ' ', text)
-    text = re.sub(r'[\u2600-\u27BF]', '', text)
-    text = re.sub(r'[\U00010000-\U0010FFFF]', '', text)
+    text = re.sub(r'[☀-➿]', '', text)
+    text = re.sub(r'[𐀀-?]', '', text)
     text = text.replace("Copy of ", "").replace("Copy of", "")
     return " ".join(text.split()).strip()
 
@@ -135,7 +139,6 @@ def determinar_genero(title):
     elif any(w in t_lower for w in ['hombre', 'chico', 'men', 'mens']): return "male"
     return "unisex"
 
-# --- NUEVA FUNCIÓN: DETECCIÓN DE MATERIAL Y PATRÓN ---
 def extraer_material_y_patron(title, description, cat_obj):
     text_to_search = (title + " " + description).lower()
     material, pattern = "", ""
@@ -214,7 +217,8 @@ def build_xml_feed():
             <g:image_link>{safe_escape(v_img)}</g:image_link>"""
             if v_images:
                 for add_img in v_images[1:11]:
-                    if add_img != v_img: xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+                    if add_img != v_img: xml += f"
+            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
             xml += f"""
             <g:price>{safe_escape(v_price)}</g:price>
             <g:availability>{v_availability}</g:availability>
@@ -223,13 +227,21 @@ def build_xml_feed():
             <g:identifier_exists>no</g:identifier_exists>
             <g:google_product_category><![CDATA[{v_cat}]]></g:google_product_category>
             <g:product_type><![CDATA[{v_pt}]]></g:product_type>"""
-            if v_color: xml += f"\n            <g:color><![CDATA[{v_color}]]></g:color>"
-            if v_size: xml += f"\n            <g:size><![CDATA[{v_size}]]></g:size>"
-            if v_mat: xml += f"\n            <g:material><![CDATA[{v_mat}]]></g:material>"
-            if v_pat: xml += f"\n            <g:pattern><![CDATA[{v_pat}]]></g:pattern>"
-            if v_gender: xml += f"\n            <g:gender>{v_gender}</g:gender>\n            <g:age_group>adult</g:age_group>"
-            if v_sku: xml += f"\n            <g:mpn>{safe_escape(v_sku)}</g:mpn>"
-            xml += "\n        </item>"
+            if v_color: xml += f"
+            <g:color><![CDATA[{v_color}]]></g:color>"
+            if v_size: xml += f"
+            <g:size><![CDATA[{v_size}]]></g:size>"
+            if v_mat: xml += f"
+            <g:material><![CDATA[{v_mat}]]></g:material>"
+            if v_pat: xml += f"
+            <g:pattern><![CDATA[{v_pat}]]></g:pattern>"
+            if v_gender: xml += f"
+            <g:gender>{v_gender}</g:gender>
+            <g:age_group>adult</g:age_group>"
+            if v_sku: xml += f"
+            <g:mpn>{safe_escape(v_sku)}</g:mpn>"
+            xml += "
+        </item>"
             return xml
 
         if not variants:
@@ -237,17 +249,18 @@ def build_xml_feed():
             gender = determinar_genero(title) if cat_obj['is_apparel'] else None
             mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
             
-            # Generación del prefijo sin el guion final
+            # --- NUEVA GENERACIÓN DE TÍTULOS SEO (SIN VARIANTES) ---
+            marca = "Opispot"
             if cat_obj['is_apparel']:
                 genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
-                prefijo = f"Ropa Urbana {genero_txt}"
+                tipo_prenda = cat_obj['pt'].split(" > ")[-1]
+                if tipo_prenda.endswith('s'): tipo_prenda = tipo_prenda[:-1] 
+                seo_title = f"{marca} {tipo_prenda} {genero_txt} | {title}"
             elif cat_obj['is_art']:
-                prefijo = "Póster Decorativo"
+                seo_title = f"{marca} Póster | {title}"
             else:
-                prefijo = ""
-            
-            # TÍTULO MODIFICADO: Producto primero
-            seo_title = f"{title} - {prefijo}" if prefijo else title
+                seo_title = f"{marca} | {title}"
+            # -------------------------------------------------------------
             
             desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
             
@@ -272,28 +285,32 @@ def build_xml_feed():
                 gender = determinar_genero(f"{title} {v_name_clean}") if cat_obj['is_apparel'] else None
                 mat, pat = extraer_material_y_patron(title, clean_description, cat_obj)
                 
-                # Generación del prefijo sin el guion final
+                # --- NUEVA GENERACIÓN DE TÍTULOS SEO (CON VARIANTES) ---
+                marca = "Opispot"
+                talla = variant.get('attributes',{}).get('size',{}).get('name')
+                
                 if cat_obj['is_apparel']:
                     genero_txt = "Unisex" if gender == "unisex" else ("Hombre" if gender == "male" else "Mujer")
-                    prefijo = f"Ropa Urbana {genero_txt}"
+                    tipo_prenda = cat_obj['pt'].split(" > ")[-1]
+                    if tipo_prenda.endswith('s'): tipo_prenda = tipo_prenda[:-1] 
+                    full_title = f"{marca} {tipo_prenda} {genero_txt} | {title}"
                 elif cat_obj['is_art']:
-                    prefijo = "Póster Decorativo"
+                    full_title = f"{marca} Póster | {title}"
                 else:
-                    prefijo = ""
+                    full_title = f"{marca} | {title}"
                 
-                # TÍTULOS MODIFICADOS: Producto primero, luego prefijo, luego color/variante
-                base_title = f"{title} - {prefijo}" if prefijo else title
-                full_title = f"{base_title} - Color {color_es}" if color_es else base_title
-                
-                if v_name_clean and color_raw.lower() not in v_name_clean.lower():
-                    full_title += f" - {v_name_clean}"
+                if color_es:
+                    full_title += f" - Color {color_es}"
+                if talla:
+                    full_title += f" - Talla {talla}"
+                # -------------------------------------------------------------
                 
                 desc_unica = f"{full_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
                 
                 v_images = [img.get('url') for img in variant.get('images', [])] or all_image_urls
                 v_img = variant.get('thumbnailImage', {}).get('url') or v_images[0]
                 
-                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=variant.get('attributes',{}).get('size',{}).get('name'), v_sku=sku, v_images=v_images, v_gender=gender)
+                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=talla, v_sku=sku, v_images=v_images, v_gender=gender)
                 
                 pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
                 google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
@@ -311,7 +328,7 @@ def build_xml_feed():
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
-    print("✅ Feeds generados con éxito: Categorías avanzadas, Materiales, Patrones y Stock corregido.")
+    print("✅ Feeds generados con éxito: Títulos SEO optimizados y colores corregidos.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS: print("❌ Credenciales faltantes")
