@@ -206,7 +206,8 @@ def build_xml_feed():
         variants = detailed_product.get('variants', [])
         base_price_str = extract_price(detailed_product)
 
-        def create_xml_item(v_id, v_group_id, v_title, v_link, v_img, v_price, v_availability, v_cat, v_pt, v_mat=None, v_pat=None, v_color=None, v_size=None, v_sku=None, v_images=None, v_gender=None):
+        # Modificamos la función para aceptar imágenes por separado
+        def create_xml_item(v_id, v_group_id, v_title, v_link, primary_img, add_imgs, v_price, v_availability, v_cat, v_pt, v_mat=None, v_pat=None, v_color=None, v_size=None, v_sku=None, v_gender=None):
             xml = f"""
         <item>
             <g:id>{safe_escape(v_id)}</g:id>
@@ -214,10 +215,10 @@ def build_xml_feed():
             <g:title><![CDATA[{v_title[:150]}]]></g:title>
             <!-- DESC_PLACEHOLDER -->
             <g:link>{safe_escape(v_link)}</g:link>
-            <g:image_link>{safe_escape(v_img)}</g:image_link>"""
-            if v_images:
-                for add_img in v_images[1:11]:
-                    if add_img != v_img: xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
+            <g:image_link>{safe_escape(primary_img)}</g:image_link>"""
+            if add_imgs:
+                for add_img in add_imgs[:10]:
+                    xml += f"\n            <g:additional_image_link>{safe_escape(add_img)}</g:additional_image_link>"
             xml += f"""
             <g:price>{safe_escape(v_price)}</g:price>
             <g:availability>{v_availability}</g:availability>
@@ -255,13 +256,25 @@ def build_xml_feed():
             
             desc_unica = f"{seo_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
             
-            xml = create_xml_item(product_id, product_id, seo_title, product_link, all_image_urls[0], base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_images=all_image_urls, v_gender=gender)
+            # Lógica de imágenes (Producto sin variantes)
+            pin_main = all_image_urls[0]
+            pin_adds = [img for img in all_image_urls if img != pin_main]
             
-            pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
-            google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
-            bing_base = remove_accents(xml)
+            gb_main = all_image_urls[2] if len(all_image_urls) > 2 else all_image_urls[0]
+            gb_adds = [img for img in all_image_urls if img != gb_main]
+            
+            # Generamos XML específico para Pinterest
+            xml_pin = create_xml_item(product_id, product_id, seo_title, product_link, pin_main, pin_adds, base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_gender=gender)
+            pinterest_items.append(xml_pin.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
+            
+            # Generamos XML específico para Google y Bing
+            xml_gb = create_xml_item(product_id, product_id, seo_title, product_link, gb_main, gb_adds, base_price_str, extract_availability(product_state, {}), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_gender=gender)
+            google_items.append(xml_gb.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
+            
+            bing_base = remove_accents(xml_gb)
             bing_desc = remove_accents(desc_unica[:10000])
             bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
+        
         else:
             for variant in variants:
                 v_id = variant.get('id', product_id)
@@ -298,14 +311,24 @@ def build_xml_feed():
                 
                 desc_unica = f"{full_title}. Diseño original de la marca independiente Opispot. Detalles: {clean_description}"
                 
+                # Lógica de imágenes (Producto con variantes)
                 v_images = [img.get('url') for img in variant.get('images', [])] or all_image_urls
-                v_img = variant.get('thumbnailImage', {}).get('url') or v_images[0]
                 
-                xml = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", v_img, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=talla, v_sku=sku, v_images=v_images, v_gender=gender)
+                pin_main = variant.get('thumbnailImage', {}).get('url') or v_images[0]
+                pin_adds = [img for img in v_images if img != pin_main]
                 
-                pinterest_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
-                google_items.append(xml.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
-                bing_base = remove_accents(xml)
+                gb_main = v_images[2] if len(v_images) > 2 else v_images[0]
+                gb_adds = [img for img in v_images if img != gb_main]
+                
+                # Generamos XML específico para Pinterest
+                xml_pin = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", pin_main, pin_adds, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=talla, v_sku=sku, v_gender=gender)
+                pinterest_items.append(xml_pin.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:500]}]]></g:description>"))
+                
+                # Generamos XML específico para Google y Bing
+                xml_gb = create_xml_item(v_id, product_id, full_title, f"{product_link}?variant={v_id}", gb_main, gb_adds, extract_price(variant), extract_availability(product_state, variant.get('stock')), cat_obj['gpc'], cat_obj['pt'], v_mat=mat, v_pat=pat, v_color=color_es, v_size=talla, v_sku=sku, v_gender=gender)
+                google_items.append(xml_gb.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{desc_unica[:5000]}]]></g:description>"))
+                
+                bing_base = remove_accents(xml_gb)
                 bing_desc = remove_accents(desc_unica[:10000])
                 bing_items.append(bing_base.replace("<!-- DESC_PLACEHOLDER -->", f"<g:description><![CDATA[{bing_desc}]]></g:description>"))
         
@@ -319,7 +342,7 @@ def build_xml_feed():
     write_feed('pinterest_feed.xml', pinterest_items)
     write_feed('google_feed.xml', google_items)
     write_feed('bing_feed.xml', bing_items)
-    print("✅ Feeds generados con éxito: Títulos SEO optimizados y colores corregidos.")
+    print("✅ Feeds generados con éxito: Títulos SEO optimizados y estrategias de imagen separadas.")
 
 if __name__ == "__main__":
     if not API_USER or not API_PASS: print("❌ Credenciales faltantes")
